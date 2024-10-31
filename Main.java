@@ -1,5 +1,6 @@
 import java.nio.CharBuffer;
-
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 import java.awt.Font;
@@ -41,6 +42,16 @@ class Display extends JFrame implements KeyListener {
 
     private Font defaultFont = new Font(Font.MONOSPACED, Font.PLAIN, FONT_SIZE);
 
+    private Map<Integer, Byte> movementKeySet = Map.of(
+            87, (byte) 0,
+            38, (byte) 0,
+            83, (byte) 1,
+            40, (byte) 1,
+            65, (byte) 2,
+            37, (byte) 2,
+            68, (byte) 3,
+            39, (byte) 3);
+
     public Display() {
         System.out.println("Display Created");
     }
@@ -56,16 +67,17 @@ class Display extends JFrame implements KeyListener {
 
         window.setSize(WIDTH * FONT_SIZE * 2, HEIGHT * FONT_SIZE * 2);
         window.setVisible(true);
-        timeStamps.End();
+        window.setLocationRelativeTo(null);
 
         jTextArea.addKeyListener(this);
 
         jTextArea.setBorder(BorderFactory.createCompoundBorder(
                 jTextArea.getBorder(),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+        timeStamps.End();
     }
 
-    public void SetDimensions(byte W, byte H) {
+    public void SetDimensions(byte W, byte H) throws Exception {
         timeStamps.Start("Setting JFrame Dimensions");
         HEIGHT = H;
         WIDTH = W;
@@ -76,7 +88,7 @@ class Display extends JFrame implements KeyListener {
         timeStamps.End();
     }
 
-    private void UpdateScreenBuffer() {
+    private void UpdateScreenBuffer(byte position, Objects e) {
         for (int i = 0; i < Screen.capacity(); i++) {
             Screen.put(i, Objects.AIR.value);
         }
@@ -128,7 +140,6 @@ class Display extends JFrame implements KeyListener {
             private static void CharacterMovement(byte dir) {
                 switch (dir) {
                     case 0:
-
                 }
             }
         }
