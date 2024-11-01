@@ -29,9 +29,11 @@ public class Main {
 class Display extends JFrame implements KeyListener {
     private byte WIDTH = 0;
     private byte HEIGHT = 0;
+    private byte SCREEN_SIZE = (byte) (WIDTH * HEIGHT);
+    private byte SPAWN_POSITION = (byte) (SCREEN_SIZE / 2);
     private byte FONT_SIZE = 10;
 
-    private CharBuffer Screen = CharBuffer.allocate(HEIGHT * WIDTH);
+    private CharBuffer Screen = CharBuffer.allocate(SCREEN_SIZE);
     private StringBuilder ScreenText = new StringBuilder();
 
     private TimeStamp timeStamps = new TimeStamp();
@@ -54,6 +56,11 @@ class Display extends JFrame implements KeyListener {
 
     public Display() {
         System.out.println("Display Created");
+    }
+
+    public void ListVariables() {
+        System.out.println("WIDTH SET : " + WIDTH + "\nHEIGHT SET : " + HEIGHT + "\nSCREEN SIZE : " + SCREEN_SIZE
+                + "\nSPAWN POSITION : " + SPAWN_POSITION);
     }
 
     public void SetupDisplay() {
@@ -85,9 +92,16 @@ class Display extends JFrame implements KeyListener {
         timeStamps.Start("Setting JFrame Dimensions");
         HEIGHT = H;
         WIDTH = W;
-        Screen = CharBuffer.allocate(HEIGHT * WIDTH);
-        for (int i = 0; i < Screen.capacity(); i++) {
-            Screen.put(i, Objects.AIR.value);
+        SCREEN_SIZE = (byte) (WIDTH * HEIGHT);
+        SPAWN_POSITION = (byte) (SCREEN_SIZE * 0.5);
+        Screen = CharBuffer.allocate(SCREEN_SIZE);
+        ListVariables();
+        for (int i = 0; i < SCREEN_SIZE; i++) {
+            if (i == SPAWN_POSITION) {
+                Screen.put(i, Objects.PLAYER.value);
+            } else {
+                Screen.put(i, Objects.AIR.value);
+            }
         }
         timeStamps.End();
     }
@@ -101,7 +115,9 @@ class Display extends JFrame implements KeyListener {
     public void UpdateScreenVisible() throws NullPointerException {
         ScreenText = new StringBuilder();
         for (Byte id = 0; id < HEIGHT; id++) {
-            ScreenText.append(Screen.subSequence(id, id + WIDTH));
+            // System.out.println(id * WIDTH + " " + (id + 1) * WIDTH); // debug the indexes
+            // for the screen
+            ScreenText.append(Screen.subSequence(id * WIDTH, (id + 1) * WIDTH));
             if (id != HEIGHT - 1) {
                 ScreenText.append("\n");
             }
