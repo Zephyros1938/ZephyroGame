@@ -1,6 +1,6 @@
-ud=$(rm -rf *.class */*.class)
+find . -type f -name "*.class" -delete
 
-ls -aR .
+ls -aR . | grep .class
 
 ignore=$(javac Main.java)
 

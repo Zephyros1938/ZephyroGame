@@ -1,4 +1,4 @@
-package ConsoleColors;
+package com.zephyros1938.lib.ConsoleColors;
 
 // from https://stackoverflow.com/a/45444716
 

@@ -1,6 +1,4 @@
 import java.nio.CharBuffer;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 
 import java.awt.Font;
@@ -9,6 +7,8 @@ import java.awt.event.KeyListener;
 import java.awt.font.TextAttribute;
 
 import javax.swing.*;
+
+import com.zephyros1938.lib.TimeStamp.*;
 
 public class Main {
 
@@ -42,7 +42,7 @@ class Display extends JFrame implements KeyListener {
 
     private Font defaultFont = new Font(Font.MONOSPACED, Font.PLAIN, FONT_SIZE);
 
-    private Map<Integer, Byte> movementKeySet = Map.of(
+    private Map<Integer, Object> movementKeySet = Map.of(
             87, (byte) 0,
             38, (byte) 0,
             83, (byte) 1,
@@ -59,6 +59,9 @@ class Display extends JFrame implements KeyListener {
     public void SetupDisplay() {
         timeStamps.Start("Setting up JFrame");
         jTextArea.setEditable(false);
+        jTextArea.setSelectionStart(0);
+        jTextArea.setSelectionEnd(0);
+        jTextArea.setFocusable(false);
         SetupFont();
 
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -180,46 +183,5 @@ class Display extends JFrame implements KeyListener {
     public void keyTyped(KeyEvent e) {
         // Handle key typed events here
         // System.out.println("Key typed: " + e.getKeyChar());
-    }
-}
-
-class TimeStamp {
-
-    private long Time;
-    private String Task;
-
-    public void Start(String tsk) {
-        Time = System.currentTimeMillis();
-        Task = tsk;
-    }
-
-    public void End() {
-        System.out.println("Completed " + Task + " In " + (System.currentTimeMillis() - Time) + "ms");
-    }
-}
-
-class HexDecoder {
-    public static int[] Bit_24(int x) {
-        int r = x >> 0x10 & 0xff;
-        int g = x >> 0x08 & 0xff;
-        int b = x & 0xff;
-
-        int[] combo = { r, g, b };
-
-        return combo;
-    }
-
-    public static int[] Bit_16(int x) {
-        int r = (x & 0xf00) >> 0x008;
-        int g = (x & 0x0f0) >> 0x004;
-        int b = x & 0x00f;
-
-        r = r << 4 | r;
-        g = g << 4 | g;
-        b = b << 4 | b;
-
-        int[] combo = { r, g, b };
-
-        return combo;
     }
 }
