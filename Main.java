@@ -9,6 +9,8 @@ import java.awt.font.TextAttribute;
 import javax.swing.*;
 
 import com.zephyros1938.lib.TimeStamp.*;
+import com.zephyros1938.lib.CharBufferUtils.*;
+
 
 public class Main {
 
@@ -18,6 +20,7 @@ public class Main {
     private static Display display = new Display();
 
     public static void main(String[] args) throws Exception {
+
         display.SetDimensions((byte) WIDTH, (byte) HEIGHT);
 
         display.SetupDisplay();
@@ -27,10 +30,10 @@ public class Main {
 }
 
 class Display extends JFrame implements KeyListener {
-    private byte WIDTH = 0;
-    private byte HEIGHT = 0;
-    private byte SCREEN_SIZE = (byte) (WIDTH * HEIGHT);
-    private byte SPAWN_POSITION = (byte) (SCREEN_SIZE / 2);
+    private byte WIDTH;
+    private byte HEIGHT;
+    private byte SCREEN_SIZE;
+    private byte SPAWN_POSITION;
     private byte FONT_SIZE = 10;
 
     private CharBuffer Screen = CharBuffer.allocate(SCREEN_SIZE);
