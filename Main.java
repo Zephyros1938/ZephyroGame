@@ -74,9 +74,10 @@ class Display extends JFrame implements KeyListener {
 
         jTextArea.addKeyListener(this);
 
-        jTextArea.setBorder(BorderFactory.createCompoundBorder(
-                jTextArea.getBorder(),
-                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+        jTextArea.setBorder(
+                BorderFactory.createCompoundBorder(
+                        jTextArea.getBorder(),
+                        BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         timeStamps.End();
     }
 
