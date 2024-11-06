@@ -4,8 +4,10 @@ A simple text-based strategy game made by [Zephyros1938](https://github.com/Zeph
 
 ## About
 
-You can run the game by executing the [Recompile Script](https://github.com/Zephyros1938/ZephyroGame/blob/main/recompile.sh)
+You can run the game by executing the [Recompile Script](/recompile.sh)
 
 ## Use
 
 controls are WASD or arrow keys.
+
+Avoid the enemies and collect orbs.
