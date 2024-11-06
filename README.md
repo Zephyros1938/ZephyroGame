@@ -11,3 +11,7 @@ You can run the game by executing the [Recompile Script](/recompile.sh)
 controls are WASD or arrow keys.
 
 Avoid the enemies and collect orbs.
+
+## LICENSE
+
+You can see our license [here](/LICENSE)
