@@ -31,7 +31,7 @@ class Display extends JFrame implements KeyListener {
     static private Integer WIDTH = 25;
     static private Integer HEIGHT = 25;
     static private Integer SCREEN_SIZE = WIDTH * HEIGHT;
-    static private Integer FONT_SIZE = 10;
+    static private Integer FONT_SIZE = 15;
 
     static private Integer playerRow;
     static private Integer playerColumn;
@@ -197,10 +197,10 @@ class Display extends JFrame implements KeyListener {
 
     enum Objects {
         LAND('#'),
-        AIR('_'),
-        PLAYER('&'),
+        AIR('—'),
+        PLAYER('@'),
         ORB('O'),
-        ENEMY('X');
+        ENEMY(':');
 
         private final char value;
 
