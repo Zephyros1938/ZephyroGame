@@ -11,9 +11,7 @@ import javax.swing.*;
 import com.zephyros1938.lib.TimeStamp.*;
 import com.zephyros1938.lib.CharBufferUtils.*;
 
-
 public class Main {
-
     private static int WIDTH = 10;
     private static int HEIGHT = 10;
 
@@ -47,7 +45,7 @@ class Display extends JFrame implements KeyListener {
 
     private Font defaultFont = new Font(Font.MONOSPACED, Font.PLAIN, FONT_SIZE);
 
-    private Map<Integer, Object> movementKeySet = Map.of(
+    private Map<Integer, Byte> movementKeySet = Map.of(
             87, (byte) 0,
             38, (byte) 0,
             83, (byte) 1,
@@ -69,9 +67,9 @@ class Display extends JFrame implements KeyListener {
     public void SetupDisplay() {
         timeStamps.Start("Setting up JFrame");
         jTextArea.setEditable(false);
-        jTextArea.setSelectionStart(0);
-        jTextArea.setSelectionEnd(0);
-        jTextArea.setFocusable(false);
+        jTextArea.setSelectionStart(-1);
+        jTextArea.setSelectionEnd(-1);
+        //jTextArea.setFocusable(false);
         SetupFont();
 
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -141,21 +139,17 @@ class Display extends JFrame implements KeyListener {
         public class Character {
             public static void CharacterMovementSwitch(int key) {
                 switch (key) {
-                    case 87:
-                    case 38:
-                        System.out.println("up");
+                    case 0:
+                        System.out.print("U");
                         break;
-                    case 83:
-                    case 40:
-                        System.out.println("down");
+                    case 1:
+                        System.out.print("D");
                         break;
-                    case 65:
-                    case 37:
-                        System.out.println("left");
+                    case 2:
+                        System.out.print("L");
                         break;
-                    case 68:
-                    case 39:
-                        System.out.println("right");
+                    case 3:
+                        System.out.print("R");
                         break;
                 }
             }
@@ -189,8 +183,8 @@ class Display extends JFrame implements KeyListener {
     @Override
     public void keyPressed(KeyEvent e) {
         // Handle key press events here
-        // System.out.println("Key pressed: " + e.getKeyCode());
-        Movement.Character.CharacterMovementSwitch(e.getKeyCode());
+        //System.out.println("Key pressed: " + e.getKeyCode());
+        Movement.Character.CharacterMovementSwitch(movementKeySet.get(e.getKeyCode()));
     }
 
     @Override
