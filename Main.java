@@ -12,14 +12,14 @@ import com.zephyros1938.lib.TimeStamp.*;
 import com.zephyros1938.lib.CharBufferUtils.*;
 
 public class Main {
-    private static int WIDTH = 10;
-    private static int HEIGHT = 10;
+    private static int WIDTH = 25;
+    private static int HEIGHT = 25;
 
     private static Display display = new Display();
 
     public static void main(String[] args) throws Exception {
 
-        display.SetDimensions((byte) WIDTH, (byte) HEIGHT);
+        display.SetDimensions(WIDTH, HEIGHT);
 
         display.SetupDisplay();
 
@@ -28,32 +28,40 @@ public class Main {
 }
 
 class Display extends JFrame implements KeyListener {
-    private byte WIDTH;
-    private byte HEIGHT;
-    private byte SCREEN_SIZE;
-    private byte SPAWN_POSITION;
-    private byte FONT_SIZE = 10;
+    static private Integer WIDTH = 25;
+    static private Integer HEIGHT = 25;
+    static private Integer SCREEN_SIZE;
+    static private Integer SPAWN_POSITION;
+    static private Integer FONT_SIZE = 10;
 
-    private CharBuffer Screen = CharBuffer.allocate(SCREEN_SIZE);
-    private StringBuilder ScreenText = new StringBuilder();
+    static private Integer Row;
+    static private Integer Column;
+    static private Integer playerPosition;
 
-    private TimeStamp timeStamps = new TimeStamp();
+    static private CharBuffer Screen;
+    static private StringBuilder ScreenText = new StringBuilder();
 
-    private JTextArea jTextArea = new JTextArea(WIDTH, HEIGHT);
+    static private TimeStamp timeStamps = new TimeStamp();
 
-    private JFrame window = new JFrame("Game Display");
+    static private JTextArea jTextArea = new JTextArea(WIDTH, HEIGHT);
 
-    private Font defaultFont = new Font(Font.MONOSPACED, Font.PLAIN, FONT_SIZE);
+    static private JFrame window = new JFrame("Game Display");
 
-    private Map<Integer, Byte> movementKeySet = Map.of(
-            87, (byte) 0,
-            38, (byte) 0,
-            83, (byte) 1,
-            40, (byte) 1,
-            65, (byte) 2,
-            37, (byte) 2,
-            68, (byte) 3,
-            39, (byte) 3);
+    static private Font defaultFont = new Font(Font.MONOSPACED, Font.PLAIN, FONT_SIZE);
+
+    public static Integer clamp(int min, int max, int value) {
+        return Math.max(min, Math.min(max, value));
+    }
+
+    static private Map<Integer, Integer> movementKeySet = Map.of(
+            87, 0,
+            38, 0,
+            83, 1,
+            40, 1,
+            65, 2,
+            37, 2,
+            68, 3,
+            39, 3);
 
     public Display() {
         System.out.println("Display Created");
@@ -61,7 +69,7 @@ class Display extends JFrame implements KeyListener {
 
     public void ListVariables() {
         System.out.println("WIDTH SET : " + WIDTH + "\nHEIGHT SET : " + HEIGHT + "\nSCREEN SIZE : " + SCREEN_SIZE
-                + "\nSPAWN POSITION : " + SPAWN_POSITION);
+                + "\nSPAWN POSITION : " + SPAWN_POSITION + " ROW : " + Row + " COL : " + Column);
     }
 
     public void SetupDisplay() {
@@ -69,7 +77,8 @@ class Display extends JFrame implements KeyListener {
         jTextArea.setEditable(false);
         jTextArea.setSelectionStart(-1);
         jTextArea.setSelectionEnd(-1);
-        //jTextArea.setFocusable(false);
+        // jTextArea.setFocusable(false);
+        jTextArea.setName("Game");
         SetupFont();
 
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -89,31 +98,42 @@ class Display extends JFrame implements KeyListener {
         timeStamps.End();
     }
 
-    public void SetDimensions(byte W, byte H) throws Exception {
+    public void SetDimensions(int W, int H) throws Exception {
         timeStamps.Start("Setting JFrame Dimensions");
         HEIGHT = H;
         WIDTH = W;
-        SCREEN_SIZE = (byte) (WIDTH * HEIGHT);
-        SPAWN_POSITION = (byte) (SCREEN_SIZE * 0.5);
+        SCREEN_SIZE = (WIDTH * HEIGHT);
         Screen = CharBuffer.allocate(SCREEN_SIZE);
-        ListVariables();
+
+        Row = (WIDTH / 2);
+        Column = (HEIGHT / 2);
+
+        SPAWN_POSITION = (Row * HEIGHT) + Column;
+        playerPosition = SPAWN_POSITION;
+        Screen = CharBuffer.allocate(SCREEN_SIZE);
         for (int i = 0; i < SCREEN_SIZE; i++) {
-            if (i == SPAWN_POSITION) {
+            if (i == playerPosition) {
                 Screen.put(i, Objects.PLAYER.value);
             } else {
                 Screen.put(i, Objects.AIR.value);
             }
         }
+
+        ListVariables();
         timeStamps.End();
     }
 
-    private void UpdateScreenBuffer(byte position, Objects e) {
-        for (int i = 0; i < Screen.capacity(); i++) {
-            Screen.put(i, Objects.AIR.value);
+    private static void UpdateScreenBuffer() {
+        for (int i = 0; i < SCREEN_SIZE; i++) {
+            if (i == playerPosition) {
+                Screen.put(i, Objects.PLAYER.value);
+            } else {
+                Screen.put(i, Objects.AIR.value);
+            }
         }
     }
 
-    public void UpdateScreenVisible() throws NullPointerException {
+    public static void UpdateScreenVisible() throws NullPointerException {
         ScreenText = new StringBuilder();
         for (Byte id = 0; id < HEIGHT; id++) {
             // System.out.println(id * WIDTH + " " + (id + 1) * WIDTH); // debug the indexes
@@ -123,7 +143,7 @@ class Display extends JFrame implements KeyListener {
                 ScreenText.append("\n");
             }
         }
-        jTextArea.insert(ScreenText.toString(), 0);
+        jTextArea.setText(ScreenText.toString());
     }
 
     private void SetupFont() {
@@ -137,26 +157,36 @@ class Display extends JFrame implements KeyListener {
 
     private class Movement {
         public class Character {
-            public static void CharacterMovementSwitch(int key) {
+            public static void CharacterMovementSwitch(int key) throws Exception {
                 switch (key) {
                     case 0:
-                        System.out.print("U");
+                        Row = clamp(0, HEIGHT - 1, --Row);
+                        playerPosition = ((HEIGHT * Row) + Column);
+                        System.out.println("ROW : " + Row + " COL : " + Column + " POS : " + playerPosition);
+                        UpdateScreenBuffer();
+                        UpdateScreenVisible();
                         break;
                     case 1:
-                        System.out.print("D");
+                        Row = clamp(0, HEIGHT - 1, ++Row);
+                        playerPosition = ((HEIGHT * Row) + Column);
+                        System.out.println("ROW : " + Row + " COL : " + Column + " POS : " + playerPosition);
+                        UpdateScreenBuffer();
+                        UpdateScreenVisible();
                         break;
                     case 2:
-                        System.out.print("L");
+                        Column = clamp(0, WIDTH - 1, --Column);
+                        playerPosition = ((WIDTH * Row) + Column);
+                        System.out.println("ROW : " + Row + " COL : " + Column + " POS : " + playerPosition);
+                        UpdateScreenBuffer();
+                        UpdateScreenVisible();
                         break;
                     case 3:
-                        System.out.print("R");
+                        Column = clamp(0, WIDTH - 1, ++Column);
+                        playerPosition = ((WIDTH * Row) + Column);
+                        System.out.println("ROW : " + Row + " COL : " + Column + " POS : " + playerPosition);
+                        UpdateScreenBuffer();
+                        UpdateScreenVisible();
                         break;
-                }
-            }
-
-            private static void CharacterMovement(byte dir) {
-                switch (dir) {
-                    case 0:
                 }
             }
         }
@@ -183,8 +213,13 @@ class Display extends JFrame implements KeyListener {
     @Override
     public void keyPressed(KeyEvent e) {
         // Handle key press events here
-        //System.out.println("Key pressed: " + e.getKeyCode());
-        Movement.Character.CharacterMovementSwitch(movementKeySet.get(e.getKeyCode()));
+        // System.out.println("Key pressed: " + e.getKeyCode());
+        try {
+            Movement.Character.CharacterMovementSwitch(movementKeySet.get(e.getKeyCode()));
+        } catch (Exception e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
     }
 
     @Override
