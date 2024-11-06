@@ -9,7 +9,6 @@ import java.awt.font.TextAttribute;
 import javax.swing.*;
 
 import com.zephyros1938.lib.TimeStamp.*;
-import com.zephyros1938.lib.CharBufferUtils.*;
 
 public class Main {
     private static int WIDTH = 25;
@@ -17,6 +16,7 @@ public class Main {
 
     private static Display display = new Display();
 
+    @SuppressWarnings("static-access")
     public static void main(String[] args) throws Exception {
 
         display.SetDimensions(WIDTH, HEIGHT);
@@ -43,7 +43,7 @@ class Display extends JFrame implements KeyListener {
 
     static private TimeStamp timeStamps = new TimeStamp();
 
-    static private JTextArea jTextArea = new JTextArea(WIDTH, HEIGHT);
+    static private JTextArea gameTextArea = new JTextArea(WIDTH, HEIGHT);
 
     static private JFrame window = new JFrame("Game Display");
 
@@ -74,26 +74,26 @@ class Display extends JFrame implements KeyListener {
 
     public void SetupDisplay() {
         timeStamps.Start("Setting up JFrame");
-        jTextArea.setEditable(false);
-        jTextArea.setSelectionStart(-1);
-        jTextArea.setSelectionEnd(-1);
-        // jTextArea.setFocusable(false);
-        jTextArea.setName("Game");
+        gameTextArea.setEditable(false);
+        gameTextArea.setSelectionStart(-1);
+        gameTextArea.setSelectionEnd(-1);
+        // gameTextArea.setFocusable(false);
+        gameTextArea.setName("Game");
         SetupFont();
 
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        window.add(jTextArea);
+        window.add(gameTextArea);
 
         window.setSize(WIDTH * FONT_SIZE * 2, HEIGHT * FONT_SIZE * 2);
         window.setVisible(true);
         window.setLocationRelativeTo(null);
 
-        jTextArea.addKeyListener(this);
+        gameTextArea.addKeyListener(this);
 
-        jTextArea.setBorder(
+        gameTextArea.setBorder(
                 BorderFactory.createCompoundBorder(
-                        jTextArea.getBorder(),
+                        gameTextArea.getBorder(),
                         BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         timeStamps.End();
     }
@@ -143,7 +143,7 @@ class Display extends JFrame implements KeyListener {
                 ScreenText.append("\n");
             }
         }
-        jTextArea.setText(ScreenText.toString());
+        gameTextArea.setText(ScreenText.toString());
     }
 
     private void SetupFont() {
@@ -152,7 +152,7 @@ class Display extends JFrame implements KeyListener {
         @SuppressWarnings("unchecked") // Ignore unchecked cast
         Map<TextAttribute, Object> attributes = (Map<TextAttribute, Object>) defaultFont.getAttributes();
         attributes.put(TextAttribute.TRACKING, FONT_SIZE / 10);
-        jTextArea.setFont(Font.getFont(attributes));
+        gameTextArea.setFont(Font.getFont(attributes));
     }
 
     private class Movement {
@@ -161,33 +161,29 @@ class Display extends JFrame implements KeyListener {
                 switch (key) {
                     case 0:
                         Row = clamp(0, HEIGHT - 1, --Row);
-                        playerPosition = ((HEIGHT * Row) + Column);
-                        System.out.println("ROW : " + Row + " COL : " + Column + " POS : " + playerPosition);
-                        UpdateScreenBuffer();
-                        UpdateScreenVisible();
+                        Move();
                         break;
                     case 1:
                         Row = clamp(0, HEIGHT - 1, ++Row);
-                        playerPosition = ((HEIGHT * Row) + Column);
-                        System.out.println("ROW : " + Row + " COL : " + Column + " POS : " + playerPosition);
-                        UpdateScreenBuffer();
-                        UpdateScreenVisible();
+                        Move();
                         break;
                     case 2:
                         Column = clamp(0, WIDTH - 1, --Column);
-                        playerPosition = ((WIDTH * Row) + Column);
-                        System.out.println("ROW : " + Row + " COL : " + Column + " POS : " + playerPosition);
-                        UpdateScreenBuffer();
-                        UpdateScreenVisible();
+                        Move();
                         break;
                     case 3:
                         Column = clamp(0, WIDTH - 1, ++Column);
-                        playerPosition = ((WIDTH * Row) + Column);
-                        System.out.println("ROW : " + Row + " COL : " + Column + " POS : " + playerPosition);
-                        UpdateScreenBuffer();
-                        UpdateScreenVisible();
+                        Move();
                         break;
                 }
+            }
+
+            public static void Move() {
+                timeStamps.Start("Moving Player");
+                playerPosition = ((HEIGHT * Row) + Column);
+                UpdateScreenBuffer();
+                UpdateScreenVisible();
+                timeStamps.End();
             }
         }
     }
