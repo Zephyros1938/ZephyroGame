@@ -1,18 +1,16 @@
 import java.nio.CharBuffer;
 import java.util.Map;
 
-import java.awt.Font;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.font.TextAttribute;
 
 import javax.swing.*;
 
 import com.zephyros1938.lib.TimeStamp.*;
 
 public class Main {
-    private static int WIDTH = 4;
-    private static int HEIGHT = 4;
+    private static int WIDTH = 40;
+    private static int HEIGHT = 40;
 
     private static Display display = new Display(WIDTH, HEIGHT);
 
@@ -26,7 +24,7 @@ class Display extends JFrame implements KeyListener {
     static private Integer WIDTH = 25;
     static private Integer HEIGHT = 25;
     static private Integer SCREEN_SIZE = WIDTH * HEIGHT;
-    static private Integer FONT_SIZE = 15;
+    static private Float FONT_SIZE = 0.8f;
 
     static private Integer playerRow;
     static private Integer playerColumn;
@@ -39,7 +37,6 @@ class Display extends JFrame implements KeyListener {
 
     static private JEditorPane jTextAreaBoard = new JEditorPane("text/html", "");
     static private JFrame window = new JFrame("Game Display");
-    static private Font defaultFont = new Font(Font.MONOSPACED, Font.PLAIN, FONT_SIZE);
 
     static private TimeStamp timeStamps = new TimeStamp();
 
@@ -82,28 +79,30 @@ class Display extends JFrame implements KeyListener {
     private static void InitializeFont() {
         StringBuilder f = new StringBuilder();
 
-        f.append("<style>p {font-family: monospace;color: red;font-size: ");
+        f.append("<html><head><style>pre {font-family: monospace;font-size: \"");
         f.append(FONT_SIZE);
-        f.append("px;letter-spacing: ");
-        f.append(FONT_SIZE * 2.5);
-        f.append("px;</style><p>");
+        f.append("em\";letter-spacing: \"");
+        f.append(100);
+        f.append("em\";}</style></head><body><pre><s>");
 
         FontStyle = f.toString();
-                
     }
 
     public static void UpdateScreenVisible() throws NullPointerException {
         ScreenText = new StringBuilder();
         ScreenText.append(FontStyle);
-        for (Byte id = 0; id < SCREEN_SIZE; id++) {
+        for (Integer id = 0; id < SCREEN_SIZE; id++) {
             // System.out.println(id * WIDTH + " " + (id + 1) * WIDTH); // debug the indexes
             // for the screen
-            ScreenText.append(Screen.subSequence(id, (id + 1)));
-            if (id % HEIGHT == HEIGHT - 1 && id != SCREEN_SIZE-1) {
+            char currentChar = Screen.get(id);
+            ScreenText.append(currentChar);
+            ScreenText.append(currentChar);
+            if (id % HEIGHT == HEIGHT - 1 && id != SCREEN_SIZE - 1) {
                 ScreenText.append("<br>");
             }
         }
-        ScreenText.append("</p>");
+        ScreenText.append("</s></pre></body></html>");
+        //System.out.println(ScreenText);
         jTextAreaBoard.setText(ScreenText.toString());
     }
 
@@ -116,7 +115,7 @@ class Display extends JFrame implements KeyListener {
 
         window.setDefaultCloseOperation(3); // Exit on close
         window.add(jTextAreaBoard);
-        window.setSize(WIDTH * FONT_SIZE * 2, HEIGHT * FONT_SIZE * 2);
+        window.setSize(WIDTH * 4, HEIGHT * 4);
         window.setLocationRelativeTo(null);
 
         jTextAreaBoard.addKeyListener(this);
@@ -209,7 +208,7 @@ class Display extends JFrame implements KeyListener {
 
     enum Objects {
         LAND('#'),
-        AIR('—'),
+        AIR(' '), // could also use —
         PLAYER('Y'),
         ORB('O'),
         ENEMY(':'),
