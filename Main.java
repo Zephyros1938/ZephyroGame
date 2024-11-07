@@ -76,7 +76,7 @@ class Display extends JFrame implements KeyListener {
                 Screen.put(i, Objects.AIR.value);
             }
         }
-    }
+    } /* test */
 
     public static void UpdateScreenVisible() throws NullPointerException {
         ScreenText = new StringBuilder();
