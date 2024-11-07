@@ -14,16 +14,11 @@ public class Main {
     private static int WIDTH = 25;
     private static int HEIGHT = 25;
 
-    private static Display display = new Display();
+    private static Display display = new Display(WIDTH, HEIGHT);
 
     @SuppressWarnings("static-access")
     public static void main(String[] args) throws Exception {
-
-        display.SetDimensions(WIDTH, HEIGHT);
-
-        display.SetupDisplay();
-
-        display.InitScreen();
+        display.Initialize();
     }
 }
 
@@ -61,57 +56,16 @@ class Display extends JFrame implements KeyListener {
             68, 3,
             39, 3);
 
-    public Display() {
+    public Display(int H, int W) {
         System.out.println("Display Created");
+        HEIGHT = H;
+        WIDTH = W;
+        SetDimensions(WIDTH, HEIGHT);
     }
 
     public void ListVariables() {
         System.out.println("WIDTH SET : " + WIDTH + "\nHEIGHT SET : " + HEIGHT + "\nSCREEN SIZE : " + SCREEN_SIZE
                 + "\nSPAWN POSITION : " + spawnPosition + " ROW : " + playerRow + " COL : " + playerColumn);
-    }
-
-    public void SetupDisplay() {
-        timeStamps.Start("Setting up JFrame");
-        jTextAreaBoard.setEditable(false);
-        jTextAreaBoard.setName("Game");
-        SetupFont();
-
-        window.setDefaultCloseOperation(3); // Exit on close
-        window.add(jTextAreaBoard);
-        window.setSize(WIDTH * FONT_SIZE * 2, HEIGHT * FONT_SIZE * 2);
-        window.setLocationRelativeTo(null);
-
-        jTextAreaBoard.addKeyListener(this);
-        jTextAreaBoard.setBorder(
-                BorderFactory.createCompoundBorder(
-                        jTextAreaBoard.getBorder(),
-                        BorderFactory.createEmptyBorder(5, 5, 5, 5)));
-        timeStamps.End();
-    }
-
-    public void SetDimensions(int W, int H) throws Exception {
-        timeStamps.Start("Setting JFrame Dimensions");
-        HEIGHT = H;
-        WIDTH = W;
-        SCREEN_SIZE = (WIDTH * HEIGHT);
-        Screen = CharBuffer.allocate(SCREEN_SIZE);
-
-        playerRow = (WIDTH / 2);
-        playerColumn = (HEIGHT / 2);
-
-        spawnPosition = (playerRow * HEIGHT) + playerColumn;
-        playerPosition = spawnPosition;
-        Screen = CharBuffer.allocate(SCREEN_SIZE);
-        for (int i = 0; i < SCREEN_SIZE; i++) {
-            if (i == playerPosition) {
-                Screen.put(i, Objects.PLAYER.value);
-            } else {
-                Screen.put(i, Objects.AIR.value);
-            }
-        }
-
-        ListVariables();
-        timeStamps.End();
     }
 
     private static void UpdateScreenBuffer() {
@@ -137,7 +91,51 @@ class Display extends JFrame implements KeyListener {
         jTextAreaBoard.setText(ScreenText.toString());
     }
 
-    public static void InitScreen() throws NullPointerException {
+    /* START INITIALIZATION */
+
+    private void SetupDisplay() {
+        timeStamps.Start("Setting up JFrame");
+        jTextAreaBoard.setEditable(false);
+        jTextAreaBoard.setName("Game");
+        SetupFont();
+
+        window.setDefaultCloseOperation(3); // Exit on close
+        window.add(jTextAreaBoard);
+        window.setSize(WIDTH * FONT_SIZE * 2, HEIGHT * FONT_SIZE * 2);
+        window.setLocationRelativeTo(null);
+
+        jTextAreaBoard.addKeyListener(this);
+        jTextAreaBoard.setBorder(
+                BorderFactory.createCompoundBorder(
+                        jTextAreaBoard.getBorder(),
+                        BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+        timeStamps.End();
+    }
+
+    private void SetDimensions(int W, int H) {
+        timeStamps.Start("Setting JFrame Dimensions");
+        SCREEN_SIZE = (WIDTH * HEIGHT);
+        Screen = CharBuffer.allocate(SCREEN_SIZE);
+
+        playerRow = (WIDTH / 2);
+        playerColumn = (HEIGHT / 2);
+
+        spawnPosition = (playerRow * HEIGHT) + playerColumn;
+        playerPosition = spawnPosition;
+        Screen = CharBuffer.allocate(SCREEN_SIZE);
+        for (int i = 0; i < SCREEN_SIZE; i++) {
+            if (i == playerPosition) {
+                Screen.put(i, Objects.PLAYER.value);
+            } else {
+                Screen.put(i, Objects.AIR.value);
+            }
+        }
+
+        ListVariables();
+        timeStamps.End();
+    }
+
+    private static void InitScreen() throws NullPointerException {
         ScreenText = new StringBuilder();
         for (Byte id = 0; id < HEIGHT; id++) {
             // System.out.println(id * WIDTH + " " + (id + 1) * WIDTH); // debug the indexes
@@ -159,6 +157,13 @@ class Display extends JFrame implements KeyListener {
         attributes.put(TextAttribute.TRACKING, FONT_SIZE / 10);
         jTextAreaBoard.setFont(Font.getFont(attributes));
     }
+
+    public void Initialize() {
+        SetupDisplay();
+        InitScreen();
+    }
+
+    /* END INITIALIZATION */
 
     private class Movement {
         public class Character {
@@ -198,9 +203,10 @@ class Display extends JFrame implements KeyListener {
     enum Objects {
         LAND('#'),
         AIR('—'),
-        PLAYER('@'),
+        PLAYER('Y'),
         ORB('O'),
-        ENEMY(':');
+        ENEMY(':'),
+        BIGENEMY('%');
 
         private final char value;
 
