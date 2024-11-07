@@ -11,8 +11,8 @@ import javax.swing.*;
 import com.zephyros1938.lib.TimeStamp.*;
 
 public class Main {
-    private static int WIDTH = 25;
-    private static int HEIGHT = 25;
+    private static int WIDTH = 4;
+    private static int HEIGHT = 4;
 
     private static Display display = new Display(WIDTH, HEIGHT);
 
@@ -35,8 +35,9 @@ class Display extends JFrame implements KeyListener {
 
     static private CharBuffer Screen;
     static private StringBuilder ScreenText = new StringBuilder();
+    static private String FontStyle;
 
-    static private JTextArea jTextAreaBoard = new JTextArea(WIDTH, HEIGHT);
+    static private JEditorPane jTextAreaBoard = new JEditorPane("text/html", "");
     static private JFrame window = new JFrame("Game Display");
     static private Font defaultFont = new Font(Font.MONOSPACED, Font.PLAIN, FONT_SIZE);
 
@@ -78,16 +79,31 @@ class Display extends JFrame implements KeyListener {
         }
     } /* test */
 
+    private static void InitializeFont() {
+        StringBuilder f = new StringBuilder();
+
+        f.append("<style>p {font-family: monospace;color: red;font-size: ");
+        f.append(FONT_SIZE);
+        f.append("px;letter-spacing: ");
+        f.append(FONT_SIZE * 2.5);
+        f.append("px;</style><p>");
+
+        FontStyle = f.toString();
+                
+    }
+
     public static void UpdateScreenVisible() throws NullPointerException {
         ScreenText = new StringBuilder();
-        for (Byte id = 0; id < HEIGHT; id++) {
+        ScreenText.append(FontStyle);
+        for (Byte id = 0; id < SCREEN_SIZE; id++) {
             // System.out.println(id * WIDTH + " " + (id + 1) * WIDTH); // debug the indexes
             // for the screen
-            ScreenText.append(Screen.subSequence(id * WIDTH, (id + 1) * WIDTH));
-            if (id != HEIGHT - 1) {
-                ScreenText.append("\n");
+            ScreenText.append(Screen.subSequence(id, (id + 1)));
+            if (id % HEIGHT == HEIGHT - 1 && id != SCREEN_SIZE-1) {
+                ScreenText.append("<br>");
             }
         }
+        ScreenText.append("</p>");
         jTextAreaBoard.setText(ScreenText.toString());
     }
 
@@ -97,7 +113,6 @@ class Display extends JFrame implements KeyListener {
         timeStamps.Start("Setting up JFrame");
         jTextAreaBoard.setEditable(false);
         jTextAreaBoard.setName("Game");
-        SetupFont();
 
         window.setDefaultCloseOperation(3); // Exit on close
         window.add(jTextAreaBoard);
@@ -149,18 +164,10 @@ class Display extends JFrame implements KeyListener {
         window.setVisible(true);
     }
 
-    private void SetupFont() {
-        // Setup JTextArea font to have a roughly 1:1 ratio
-        // character width and height
-        @SuppressWarnings("unchecked") // Ignore unchecked cast
-        Map<TextAttribute, Object> attributes = (Map<TextAttribute, Object>) defaultFont.getAttributes();
-        attributes.put(TextAttribute.TRACKING, FONT_SIZE / 10);
-        jTextAreaBoard.setFont(Font.getFont(attributes));
-    }
-
     public void Initialize() {
         SetupDisplay();
         InitScreen();
+        InitializeFont();
     }
 
     /* END INITIALIZATION */
