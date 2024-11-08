@@ -37,16 +37,6 @@ public class Display implements KeyListener {
         return (value < min ? min : value) > max ? max : (value < min ? min : value);
     }
 
-    static private Map<Integer, Integer> movementKeySet = Map.of(
-            87, 0,
-            38, 0,
-            83, 1,
-            40, 1,
-            65, 2,
-            37, 2,
-            68, 3,
-            39, 3);
-
     public Display(int H, int W, int SCREEN_X, int SCREEN_Y) {
         System.out.println("Display Created");
         HEIGHT = H;
@@ -197,6 +187,16 @@ public class Display implements KeyListener {
                 UpdateScreenVisible();
                 timeStamps.End();
             }
+
+            static private Map<Integer, Integer> controlKeySet = Map.of(
+                    87, 0,
+                    38, 0,
+                    83, 1,
+                    40, 1,
+                    65, 2,
+                    37, 2,
+                    68, 3,
+                    39, 3);
         }
 
         public class Detection {
@@ -248,9 +248,9 @@ public class Display implements KeyListener {
         // Handle key press events here
         // System.out.println("Key pressed: " + e.getKeyCode());
         try {
-            Character.Movement.ControlSwitch(movementKeySet.get(e.getKeyCode()));
+            Character.Movement.ControlSwitch(Character.Movement.controlKeySet.get(e.getKeyCode()));
         } catch (Exception e1) {
-            //e1.printStackTrace();
+            // e1.printStackTrace();
         }
     }
 
