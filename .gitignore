@@ -1,3 +1,6 @@
 *.class
 
 __test.*
+
+/build
+/build/*
