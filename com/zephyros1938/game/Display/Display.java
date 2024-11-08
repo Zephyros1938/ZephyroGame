@@ -162,20 +162,28 @@ public class Display implements KeyListener {
             public static void CharacterMovementSwitch(int key) throws Exception {
                 switch (key) {
                     case 0:
-                        playerRow = clamp(0, HEIGHT - 1, --playerRow);
-                        Move();
+                        if (Detection.CanMove(0)) {
+                            playerRow = clamp(0, HEIGHT - 1, --playerRow);
+                            Move();
+                        }
                         break;
                     case 1:
-                        playerRow = clamp(0, HEIGHT - 1, ++playerRow);
-                        Move();
+                        if (Detection.CanMove(1)) {
+                            playerRow = clamp(0, HEIGHT - 1, ++playerRow);
+                            Move();
+                        }
                         break;
                     case 2:
-                        playerColumn = clamp(0, WIDTH - 1, --playerColumn);
-                        Move();
+                        if (Detection.CanMove(2)) {
+                            playerColumn = clamp(0, WIDTH - 1, --playerColumn);
+                            Move();
+                        }
                         break;
                     case 3:
-                        playerColumn = clamp(0, WIDTH - 1, ++playerColumn);
-                        Move();
+                        if (Detection.CanMove(3)) {
+                            playerColumn = clamp(0, WIDTH - 1, ++playerColumn);
+                            Move();
+                        }
                         break;
                     default:
                         break;
@@ -190,8 +198,28 @@ public class Display implements KeyListener {
                 // timeStamps.End();
             }
         }
+
         public class Detection {
-            
+            static Boolean CanMove(int dir) {
+                int targetPosition, targetRow = playerRow, targetColumn = playerColumn;
+                switch (dir) {
+                    case 0:
+                        targetRow = clamp(0, HEIGHT - 1, playerRow-1);
+                    case 1:
+                        targetRow = clamp(0, HEIGHT - 1, playerRow+1);
+                    case 2:
+                        targetColumn = clamp(0, WIDTH - 1, playerColumn-1);
+                    case 3:
+                        targetColumn = clamp(0, WIDTH - 1, playerColumn+1);
+                }
+                targetPosition = ((HEIGHT * targetRow) + targetColumn);
+                char targetCell = Screen.get(targetPosition);
+                System.out.println(targetPosition + " ROW : " + targetRow + " COL : " + targetColumn);
+                if (targetCell == Objects.AIR.value || targetCell == Objects.PLAYER.value) {
+                    return true;
+                }
+                return false;
+            }
         }
     }
 
