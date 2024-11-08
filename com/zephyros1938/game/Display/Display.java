@@ -69,7 +69,7 @@ public class Display implements KeyListener {
                 Screen.put(i, Objects.AIR.value);
             }
         }
-    } /* test */
+    }
 
     private static void InitializeFont() {
         StringBuilder f = new StringBuilder();
@@ -145,21 +145,7 @@ public class Display implements KeyListener {
     }
 
     private static void InitScreen() throws NullPointerException {
-        ScreenText = new StringBuilder();
-        ScreenText.append(FontStyle);
-        for (Integer id = 0; id < SCREEN_SIZE; id++) {
-            // System.out.println(id * WIDTH + " " + (id + 1) * WIDTH); // debug the indexes
-            // for the screen
-            char currentChar = Screen.get(id);
-            ScreenText.append(currentChar);
-            ScreenText.append(currentChar);
-            if (id % HEIGHT == HEIGHT - 1 && id != SCREEN_SIZE - 1) {
-                ScreenText.append("<br>");
-            }
-        }
-        ScreenText.append("</s></pre></body></html>");
-        // System.out.println(ScreenText);
-        jTextAreaBoard.setText(ScreenText.toString());
+        UpdateScreenVisible();
         window.setVisible(true);
     }
 
