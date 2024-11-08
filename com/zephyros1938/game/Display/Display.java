@@ -214,7 +214,8 @@ public class Display implements KeyListener {
                 }
                 targetPosition = ((HEIGHT * targetRow) + targetColumn);
                 char targetCell = Screen.get(targetPosition);
-                //System.out.println(targetPosition + " ROW : " + targetRow + " COL : " + targetColumn);
+                // System.out.println(targetPosition + " ROW : " + targetRow + " COL : " +
+                // targetColumn);
                 if (targetCell == Objects.AIR.value || targetCell == Objects.PLAYER.value) {
                     return true;
                 }
