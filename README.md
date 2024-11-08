@@ -4,7 +4,13 @@ A simple text-based strategy game made by [Zephyros1938](https://github.com/Zeph
 
 ## About
 
-You can run the game by executing the [Recompile Script](/recompile.sh)
+This game is a work in progress, as Zephyros1938 is still currently learning Java; Expect changes.
+
+### Recompilation
+
+You can run the game by executing the Recompilation Scripts:
+- [Linux/Mac](/recompile.sh)
+- [Windows](/recompile.bat)
 
 ### Use
 
