@@ -4,11 +4,11 @@ A simple text-based strategy game made by [Zephyros1938](https://github.com/Zeph
 
 ## About
 
-This game is a work in progress, as Zephyros1938 is still currently learning Java; Expect changes.
+This game is a work in progress, as Zephyros1938 is actively learning Java; Expect changes.
 
 ### Recompilation
 
-You can run the game by executing the Recompilation Scripts:
+You can run the game by executing either of the Recompilation Scripts:
 - [Linux/Mac](/recompile.sh)
 - [Windows](/recompile.bat)
 
