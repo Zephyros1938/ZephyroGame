@@ -148,7 +148,7 @@ public class Display implements KeyListener {
     /* END INITIALIZATION */
 
     private class Character {
-        public class Movement {
+        public class Controller {
             public static void ControlSwitch(int key) throws Exception {
                 switch (key) {
                     case 0: // UP
@@ -248,7 +248,7 @@ public class Display implements KeyListener {
         // Handle key press events here
         // System.out.println("Key pressed: " + e.getKeyCode());
         try {
-            Character.Movement.ControlSwitch(Character.Movement.controlKeySet.get(e.getKeyCode()));
+            Character.Controller.ControlSwitch(Character.Controller.controlKeySet.get(e.getKeyCode()));
         } catch (Exception e1) {
             // e1.printStackTrace();
         }
