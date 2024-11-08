@@ -146,22 +146,27 @@ public class Display implements KeyListener {
 
     private static void InitScreen() throws NullPointerException {
         ScreenText = new StringBuilder();
-        for (Byte id = 0; id < HEIGHT; id++) {
+        ScreenText.append(FontStyle);
+        for (Integer id = 0; id < SCREEN_SIZE; id++) {
             // System.out.println(id * WIDTH + " " + (id + 1) * WIDTH); // debug the indexes
             // for the screen
-            ScreenText.append(Screen.subSequence(id * WIDTH, (id + 1) * WIDTH));
-            if (id != HEIGHT - 1) {
-                ScreenText.append("\n");
+            char currentChar = Screen.get(id);
+            ScreenText.append(currentChar);
+            ScreenText.append(currentChar);
+            if (id % HEIGHT == HEIGHT - 1 && id != SCREEN_SIZE - 1) {
+                ScreenText.append("<br>");
             }
         }
+        ScreenText.append("</s></pre></body></html>");
+        //System.out.println(ScreenText);
         jTextAreaBoard.setText(ScreenText.toString());
         window.setVisible(true);
     }
 
     public void Initialize() {
         SetupDisplay();
-        InitScreen();
         InitializeFont();
+        InitScreen();
     }
 
     /* END INITIALIZATION */
