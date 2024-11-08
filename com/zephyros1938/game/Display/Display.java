@@ -161,25 +161,25 @@ public class Display implements KeyListener {
         public class Character {
             public static void CharacterMovementSwitch(int key) throws Exception {
                 switch (key) {
-                    case 0:
+                    case 0: // UP
                         if (Detection.CanMove(0)) {
                             playerRow = clamp(0, HEIGHT - 1, --playerRow);
                             Move();
                         }
                         break;
-                    case 1:
+                    case 1: // DOWN
                         if (Detection.CanMove(1)) {
                             playerRow = clamp(0, HEIGHT - 1, ++playerRow);
                             Move();
                         }
                         break;
-                    case 2:
+                    case 2: // LEFT
                         if (Detection.CanMove(2)) {
                             playerColumn = clamp(0, WIDTH - 1, --playerColumn);
                             Move();
                         }
                         break;
-                    case 3:
+                    case 3: // RIGHT
                         if (Detection.CanMove(3)) {
                             playerColumn = clamp(0, WIDTH - 1, ++playerColumn);
                             Move();
@@ -203,14 +203,14 @@ public class Display implements KeyListener {
             static Boolean CanMove(int dir) {
                 int targetPosition, targetRow = playerRow, targetColumn = playerColumn;
                 switch (dir) {
-                    case 0:
-                        targetRow = clamp(0, HEIGHT - 1, playerRow-1);
-                    case 1:
-                        targetRow = clamp(0, HEIGHT - 1, playerRow+1);
-                    case 2:
-                        targetColumn = clamp(0, WIDTH - 1, playerColumn-1);
-                    case 3:
-                        targetColumn = clamp(0, WIDTH - 1, playerColumn+1);
+                    case 0: // UP
+                        targetRow = clamp(0, HEIGHT - 1, playerRow - 1);
+                    case 1: // DOWN
+                        targetRow = clamp(0, HEIGHT - 1, playerRow + 1);
+                    case 2: // LEFT
+                        targetColumn = clamp(0, WIDTH - 1, playerColumn - 1);
+                    case 3: // RIGHT
+                        targetColumn = clamp(0, WIDTH - 1, playerColumn + 1);
                 }
                 targetPosition = ((HEIGHT * targetRow) + targetColumn);
                 char targetCell = Screen.get(targetPosition);
