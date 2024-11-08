@@ -157,9 +157,9 @@ public class Display implements KeyListener {
 
     /* END INITIALIZATION */
 
-    private class Movement {
-        public class Character {
-            public static void CharacterMovementSwitch(int key) throws Exception {
+    private class Character {
+        public class Movement {
+            public static void ControlSwitch(int key) throws Exception {
                 switch (key) {
                     case 0: // UP
                         if (Detection.CanMove(0)) {
@@ -191,11 +191,11 @@ public class Display implements KeyListener {
             }
 
             public static void Move() {
-                // timeStamps.Start("Moving Player");
+                timeStamps.Start("Moving Player");
                 playerPosition = ((HEIGHT * playerRow) + playerColumn);
                 UpdateScreenBuffer();
                 UpdateScreenVisible();
-                // timeStamps.End();
+                timeStamps.End();
             }
         }
 
@@ -248,10 +248,9 @@ public class Display implements KeyListener {
         // Handle key press events here
         // System.out.println("Key pressed: " + e.getKeyCode());
         try {
-            Movement.Character.CharacterMovementSwitch(movementKeySet.get(e.getKeyCode()));
+            Character.Movement.ControlSwitch(movementKeySet.get(e.getKeyCode()));
         } catch (Exception e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
+            //e1.printStackTrace();
         }
     }
 
