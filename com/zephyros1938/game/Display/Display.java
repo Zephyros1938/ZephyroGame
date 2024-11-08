@@ -97,7 +97,7 @@ public class Display implements KeyListener {
             }
         }
         ScreenText.append("</s></pre></body></html>");
-        //System.out.println(ScreenText);
+        // System.out.println(ScreenText);
         jTextAreaBoard.setText(ScreenText.toString());
     }
 
@@ -158,7 +158,7 @@ public class Display implements KeyListener {
             }
         }
         ScreenText.append("</s></pre></body></html>");
-        //System.out.println(ScreenText);
+        // System.out.println(ScreenText);
         jTextAreaBoard.setText(ScreenText.toString());
         window.setVisible(true);
     }
@@ -203,6 +203,9 @@ public class Display implements KeyListener {
                 UpdateScreenVisible();
                 // timeStamps.End();
             }
+        }
+        public class Detection {
+            
         }
     }
 
