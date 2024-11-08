@@ -1,7 +1,7 @@
 package com.zephyros1938.lib.math.Vector;
 
 public class Vector {
-    public class Vector2 {
+    public static class Vector2 {
         public double X;
         public double Y;
 
@@ -38,13 +38,23 @@ public class Vector {
             return new Vector2(this.X / mag, this.Y / mag);
         }
 
+        public Vector2 randomUnitVector() {
+            double theta = 2 * Math.PI * Math.random();
+            double uv_x = Math.sin(theta);
+            double uv_y = Math.cos(theta);
+
+            Vector2 uv = new Vector2(uv_x, uv_y);
+            
+            return this.add(uv);
+        }
+
         @Override
         public String toString() {
             return "(" + this.X + "," + this.Y + ")";
         }
     }
 
-    public class Vector3 {
+    public static class Vector3 {
         public double X;
         public double Y;
         public double Z;
@@ -89,7 +99,7 @@ public class Vector {
         }
     }
 
-    public class Vector4 {
+    public static class Vector4 {
         public double X;
         public double Y;
         public double Z;
