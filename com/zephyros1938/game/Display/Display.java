@@ -120,7 +120,8 @@ public class Display implements KeyListener {
                 ScreenText.append("<br>");
             }
         }
-        ScreenText.append("</s></pre></body></html>");
+        ScreenText.append("</s></pre><br>PC: " + playerColumn + " PR: " + playerRow + " PP: " + playerPosition
+                + "</body></html>");
         // System.out.println(ScreenText);
         jTextAreaBoard.setText(ScreenText.toString());
     }
@@ -180,7 +181,7 @@ public class Display implements KeyListener {
             public static void ControlSwitch(int key) {
                 switch (key) {
                     case 0: // UP
-                        if (Detection.CanMove('u')) {
+                        if (Detection.CanMove(0)) {
                             playerRow = clamp(0, HEIGHT - 1, playerRow - 1);
                             Move();
                             break;
@@ -188,7 +189,7 @@ public class Display implements KeyListener {
                         System.out.println("Cannot move");
                         break;
                     case 1: // DOWN
-                        if (Detection.CanMove('d')) {
+                        if (Detection.CanMove(1)) {
                             playerRow = clamp(0, HEIGHT - 1, playerRow + 1);
                             Move();
                             break;
@@ -196,7 +197,7 @@ public class Display implements KeyListener {
                         System.out.println("Cannot move");
                         break;
                     case 2: // LEFT
-                        if (Detection.CanMove('l')) {
+                        if (Detection.CanMove(2)) {
                             playerColumn = clamp(0, WIDTH - 1, playerColumn - 1);
                             Move();
                             break;
@@ -204,7 +205,7 @@ public class Display implements KeyListener {
                         System.out.println("Cannot move");
                         break;
                     case 3: // RIGHT
-                        if (Detection.CanMove('r')) {
+                        if (Detection.CanMove(3)) {
                             playerColumn = clamp(0, WIDTH - 1, playerColumn + 1);
                             Move();
                             break;
@@ -237,23 +238,31 @@ public class Display implements KeyListener {
 
         public static class Detection { // something is going wrong here
             private static Boolean CanMove(int dir) {
-                int targetPosition, targetRow = playerRow, targetColumn = playerColumn;
+                int targetPosition = playerPosition, targetRow = playerRow, targetColumn = playerColumn;
+                System.out.println(dir);
                 switch (dir) {
                     case 0: // UP
                         targetRow = clamp(0, HEIGHT - 1, playerRow - 1);
+                        targetPosition = ((HEIGHT * (targetRow)) + playerColumn);
+                        break;
                     case 1: // DOWN
                         targetRow = clamp(0, HEIGHT - 1, playerRow + 1);
+                        targetPosition = ((HEIGHT * (targetRow)) + playerColumn);
+                        break;
                     case 2: // LEFT
                         targetColumn = clamp(0, WIDTH - 1, playerColumn - 1);
+                        targetPosition = ((HEIGHT * (playerRow)) + targetColumn);
+                        break;
                     case 3: // RIGHT
                         targetColumn = clamp(0, WIDTH - 1, playerColumn + 1);
+                        targetPosition = ((HEIGHT * (playerRow)) + targetColumn);
+                        break;
                 }
-                targetPosition = ((HEIGHT * targetRow) + targetColumn);
                 char targetCell = Screen.get(targetPosition);
                 System.out.println(playerPosition + " CRW : " + playerRow + " CCL : " + playerColumn);
                 System.out.println(targetPosition + " ROW : " + targetRow + " COL : " + targetColumn);
-                System.out.println(" TCEL : " + targetCell);
-                if (targetCell == Objects.AIR.value || targetCell == Objects.PLAYER.value) {
+                System.out.println("TCEL : " + targetCell);
+                if (targetCell != Objects.LAND.value) {
                     return true;
                 }
                 return false;
