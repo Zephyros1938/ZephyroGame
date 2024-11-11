@@ -1,7 +1,9 @@
 package com.zephyros1938.lib.math.Vector;
 
 public class Vector {
+
     public static class Vector2 {
+
         public double x;
         public double y;
 
