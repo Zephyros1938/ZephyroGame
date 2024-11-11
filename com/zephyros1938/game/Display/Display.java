@@ -10,10 +10,12 @@ import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 
 import com.zephyros1938.lib.TimeStamp.TimeStamp;
+import com.zephyros1938.lib.math.PerlinNoise.PerlinNoise;
+import com.zephyros1938.lib.math.Util.Util;
 
 public class Display implements KeyListener {
-    static private Integer WIDTH = 25;
-    static private Integer HEIGHT = 25;
+    static private Integer WIDTH = 5;
+    static private Integer HEIGHT = 5;
     static private Integer SCREEN_WIDTH;
     static private Integer SCREEN_HEIGHT;
     static private Integer SCREEN_SIZE = WIDTH * HEIGHT;
@@ -23,6 +25,10 @@ public class Display implements KeyListener {
     static private Integer playerColumn;
     static private Integer spawnPosition;
     static private Integer playerPosition;
+
+    static private PerlinNoise terrainPerlinNoise = new PerlinNoise(123141);
+    static private Double terrainAmplitude = 255.0;
+    static private Double terrainFrequency = 50.0;
 
     static private CharBuffer Screen;
     static private StringBuilder ScreenText = new StringBuilder();
@@ -52,12 +58,40 @@ public class Display implements KeyListener {
     }
 
     private static void UpdateScreenBuffer() {
-        for (int i = 0; i < SCREEN_SIZE; i++) {
-            if (i == playerPosition) {
-                Screen.put(i, Objects.PLAYER.value);
-            } else {
-                Screen.put(i, Objects.AIR.value);
+        /*
+         * for (int i = 0; i < SCREEN_SIZE; i++) {
+         * if (i == playerPosition) {
+         * Screen.put(i, Objects.PLAYER.value);
+         * } else {
+         * Screen.put(i, Objects.AIR.value);
+         * }
+         * }
+         */
+
+        for (int y = 0; y < HEIGHT; y++) {
+            for (int x = 0; x < WIDTH; x++) {
+                double xi = x + 0.01, yi = y + 0.01;
+
+                double noiseBlock = Util.clampDouble(
+                        (terrainPerlinNoise.noise(xi * terrainFrequency, yi * terrainFrequency)) * terrainAmplitude);
+
+                int screenIndex = (y * HEIGHT) + x;
+                // System.out.println("screen ind : " + screenIndex);
+
+                if (x == playerColumn && y == playerRow) {
+                    Screen.put(screenIndex, Objects.PLAYER.value);
+                } else {
+                    Screen.put(screenIndex, getTerrainBlock(noiseBlock));
+                }
             }
+        }
+    }
+
+    private static char getTerrainBlock(double height) {
+        if (height > 128.0) {
+            return Objects.LAND.value;
+        } else {
+            return Objects.AIR.value;
         }
     }
 
@@ -122,13 +156,7 @@ public class Display implements KeyListener {
         spawnPosition = (playerRow * HEIGHT) + playerColumn;
         playerPosition = spawnPosition;
         Screen = CharBuffer.allocate(SCREEN_SIZE);
-        for (int i = 0; i < SCREEN_SIZE; i++) {
-            if (i == playerPosition) {
-                Screen.put(i, Objects.PLAYER.value);
-            } else {
-                Screen.put(i, Objects.AIR.value);
-            }
-        }
+        UpdateScreenBuffer();
 
         ListVariables();
         timeStamps.End();
@@ -147,33 +175,41 @@ public class Display implements KeyListener {
 
     /* END INITIALIZATION */
 
-    private class Player {
-        public class Controller {
-            public static void ControlSwitch(int key) throws Exception {
+    static private class Player {
+        public static class Controller {
+            public static void ControlSwitch(int key) {
                 switch (key) {
                     case 0: // UP
-                        if (Detection.CanMove(0)) {
-                            playerRow = clamp(0, HEIGHT - 1, --playerRow);
+                        if (Detection.CanMove('u')) {
+                            playerRow = clamp(0, HEIGHT - 1, playerRow - 1);
                             Move();
+                            break;
                         }
+                        System.out.println("Cannot move");
                         break;
                     case 1: // DOWN
-                        if (Detection.CanMove(1)) {
-                            playerRow = clamp(0, HEIGHT - 1, ++playerRow);
+                        if (Detection.CanMove('d')) {
+                            playerRow = clamp(0, HEIGHT - 1, playerRow + 1);
                             Move();
+                            break;
                         }
+                        System.out.println("Cannot move");
                         break;
                     case 2: // LEFT
-                        if (Detection.CanMove(2)) {
-                            playerColumn = clamp(0, WIDTH - 1, --playerColumn);
+                        if (Detection.CanMove('l')) {
+                            playerColumn = clamp(0, WIDTH - 1, playerColumn - 1);
                             Move();
+                            break;
                         }
+                        System.out.println("Cannot move");
                         break;
                     case 3: // RIGHT
-                        if (Detection.CanMove(3)) {
-                            playerColumn = clamp(0, WIDTH - 1, ++playerColumn);
+                        if (Detection.CanMove('r')) {
+                            playerColumn = clamp(0, WIDTH - 1, playerColumn + 1);
                             Move();
+                            break;
                         }
+                        System.out.println("Cannot move");
                         break;
                     default:
                         break;
@@ -199,8 +235,8 @@ public class Display implements KeyListener {
                     39, 3);
         }
 
-        public class Detection {
-            static Boolean CanMove(int dir) {
+        public static class Detection { // something is going wrong here
+            private static Boolean CanMove(int dir) {
                 int targetPosition, targetRow = playerRow, targetColumn = playerColumn;
                 switch (dir) {
                     case 0: // UP
@@ -214,8 +250,9 @@ public class Display implements KeyListener {
                 }
                 targetPosition = ((HEIGHT * targetRow) + targetColumn);
                 char targetCell = Screen.get(targetPosition);
-                // System.out.println(targetPosition + " ROW : " + targetRow + " COL : " +
-                // targetColumn);
+                System.out.println(playerPosition + " CRW : " + playerRow + " CCL : " + playerColumn);
+                System.out.println(targetPosition + " ROW : " + targetRow + " COL : " + targetColumn);
+                System.out.println(" TCEL : " + targetCell);
                 if (targetCell == Objects.AIR.value || targetCell == Objects.PLAYER.value) {
                     return true;
                 }
@@ -246,11 +283,13 @@ public class Display implements KeyListener {
     @Override
     public void keyPressed(KeyEvent e) {
         // Handle key press events here
-        // System.out.println("Key pressed: " + e.getKeyCode());
+        System.out.println("Key pressed: " + e.getKeyCode() + e.getKeyChar());
         try {
-            Player.Controller.ControlSwitch(Player.Controller.controlKeySet.get(e.getKeyCode()));
+            int p = Player.Controller.controlKeySet.get(e.getKeyCode());
+            System.out.println(p);
+            Player.Controller.ControlSwitch(p);
         } catch (Exception e1) {
-            // e1.printStackTrace();
+            e1.printStackTrace();
         }
     }
 
