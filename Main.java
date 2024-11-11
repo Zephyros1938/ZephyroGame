@@ -3,8 +3,8 @@ import com.zephyros1938.lib.math.PerlinNoise.PerlinNoise;
 
 
 public class Main {
-    private static int WIDTH = 5;
-    private static int HEIGHT = 5;
+    private static int WIDTH = 50;
+    private static int HEIGHT = 50;
 
     private static PerlinNoise p = new PerlinNoise(1);
 

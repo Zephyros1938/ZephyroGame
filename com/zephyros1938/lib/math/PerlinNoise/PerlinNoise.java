@@ -47,7 +47,7 @@ public class PerlinNoise {
     public double noise(double x, double y) {
         int X = (int) Math.floor(x) & 255; // GET UNIT SQUARE CONTAINING POINT
         int Y = (int) Math.floor(y) & 255;
-        System.out.println("X&Y : " + X + " " + Y);
+        //System.out.println("X&Y : " + X + " " + Y);
 
         double xCoord = Math.floor(x); // RELATIVE XY COORDS WITHIN THE SQUARE
         double yCoord = Math.floor(y);
