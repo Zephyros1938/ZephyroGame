@@ -47,6 +47,7 @@ public class PerlinNoise {
     public double noise(double x, double y) {
         int X = (int) Math.floor(x) & 255; // GET UNIT SQUARE CONTAINING POINT
         int Y = (int) Math.floor(y) & 255;
+        System.out.println("X&Y : " + X + " " + Y);
 
         double xCoord = Math.floor(x); // RELATIVE XY COORDS WITHIN THE SQUARE
         double yCoord = Math.floor(y);
@@ -72,7 +73,7 @@ public class PerlinNoise {
         double lerpX1 = Util.lerp(u, gradAA, gradBA);
         double lerpX2 = Util.lerp(u, gradAB, gradBB);
 
-        double lerpedValue = Util.lerp(v, lerpX1, lerpX2) + 0.5;
+        double lerpedValue = Util.lerp(v, lerpX1, lerpX2);
 
         /* // DEBUG
          * System.out.println(
@@ -85,6 +86,7 @@ public class PerlinNoise {
          * "\nlerpX1: " + lerpX1 + ", lerpX2: " + lerpX2 +
          * "\nResult: " + lerpedValue + "\n");
          */
+        //System.out.println(lerpedValue);
 
         return lerpedValue;
     }

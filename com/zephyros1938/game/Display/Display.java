@@ -28,7 +28,7 @@ public class Display implements KeyListener {
 
     static private PerlinNoise terrainPerlinNoise = new PerlinNoise(123141);
     static private Double terrainAmplitude = 255.0;
-    static private Double terrainFrequency = 50.0;
+    static private Double terrainFrequency = 0.2;
 
     static private CharBuffer Screen;
     static private StringBuilder ScreenText = new StringBuilder();
@@ -69,11 +69,15 @@ public class Display implements KeyListener {
          */
 
         for (int y = 0; y < HEIGHT; y++) {
-            for (int x = 0; x < WIDTH; x++) {
-                double xi = x + 0.01, yi = y + 0.01;
+            for (int x = 0; x < WIDTH; x++) { //! USE THIS FOR BETTER NOISE RESULTS: https://rtouti.github.io/graphics/perlin-noise-algorithm
+                double xi = x * 0.01, yi = y * 0.01;
 
-                double noiseBlock = Util.clampDouble(
-                        (terrainPerlinNoise.noise(xi * terrainFrequency, yi * terrainFrequency)) * terrainAmplitude);
+                float n = (float) (terrainPerlinNoise.noise(xi * terrainFrequency, yi * terrainFrequency) * terrainAmplitude);
+
+                n += 1.0;
+                n /= 2.0;
+
+                int c = Math.round(255*n);
 
                 int screenIndex = (y * HEIGHT) + x;
                 // System.out.println("screen ind : " + screenIndex);
@@ -81,14 +85,14 @@ public class Display implements KeyListener {
                 if (x == playerColumn && y == playerRow) {
                     Screen.put(screenIndex, Objects.PLAYER.value);
                 } else {
-                    Screen.put(screenIndex, getTerrainBlock(noiseBlock));
+                    Screen.put(screenIndex, getTerrainBlock(c));
                 }
             }
         }
     }
 
     private static char getTerrainBlock(double height) {
-        if (height > 128.0) {
+        if (height >= 128.0) {
             return Objects.LAND.value;
         } else {
             return Objects.AIR.value;
@@ -177,6 +181,15 @@ public class Display implements KeyListener {
     /* END INITIALIZATION */
 
     static private class Player {
+
+        private final Long PLAYER_ID;
+        private final String PLAYER_NAME;
+
+        Player(Long PID, String NAME) {
+            this.PLAYER_ID = PID;
+            this.PLAYER_NAME = NAME;
+        }
+
         public static class Controller {
             public static void ControlSwitch(int key) {
                 switch (key) {
@@ -259,9 +272,9 @@ public class Display implements KeyListener {
                         break;
                 }
                 char targetCell = Screen.get(targetPosition);
-                System.out.println(playerPosition + " CRW : " + playerRow + " CCL : " + playerColumn);
-                System.out.println(targetPosition + " ROW : " + targetRow + " COL : " + targetColumn);
-                System.out.println("TCEL : " + targetCell);
+                //System.out.println(playerPosition + " CRW : " + playerRow + " CCL : " + playerColumn);
+                //System.out.println(targetPosition + " ROW : " + targetRow + " COL : " + targetColumn);
+                //System.out.println("TCEL : " + targetCell);
                 if (targetCell != Objects.LAND.value) {
                     return true;
                 }
@@ -272,11 +285,11 @@ public class Display implements KeyListener {
 
     enum Objects {
         LAND('#'),
-        AIR(' '), // could also use —
+        AIR(' '),
         PLAYER('Y'),
         ORB('O'),
-        ENEMY(':'),
-        BIGENEMY('%');
+        ENEMY('Ё'),
+        BIGENEMY('Ж');
 
         private final char value;
 

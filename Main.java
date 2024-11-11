@@ -1,8 +1,12 @@
 import com.zephyros1938.game.Display.Display;
+import com.zephyros1938.lib.math.PerlinNoise.PerlinNoise;
+
 
 public class Main {
-    private static int WIDTH = 15;
-    private static int HEIGHT = 15;
+    private static int WIDTH = 5;
+    private static int HEIGHT = 5;
+
+    private static PerlinNoise p = new PerlinNoise(1);
 
     private static Display display = new Display(WIDTH, HEIGHT, 1920, 1080);
 
