@@ -27,8 +27,8 @@ public class Display implements KeyListener {
     static private Integer playerPosition;
 
     static private PerlinNoise terrainPerlinNoise = new PerlinNoise(123141);
-    static private Double terrainAmplitude = 1.0;
-    static private Double terrainFrequency = 0.2;
+    static private float terrainAmplitude = 1.0f;
+    static private float terrainFrequency = 0.2f;
 
     static private CharBuffer Screen;
     static private StringBuilder ScreenText = new StringBuilder();
@@ -70,14 +70,14 @@ public class Display implements KeyListener {
 
         for (int y = 0; y < HEIGHT; y++) {
             for (int x = 0; x < WIDTH; x++) { //! USE THIS FOR BETTER NOISE RESULTS: https://rtouti.github.io/graphics/perlin-noise-algorithm
-                double xi = x * terrainFrequency, yi = y * terrainFrequency;
+                float xi = x * terrainFrequency, yi = y * terrainFrequency;
 
                 float n = (float) (terrainPerlinNoise.noise(xi, yi) * terrainAmplitude);
 
                 n += 1.0;
                 n /= 2.0;
 
-                double c = Math.round(255*n);
+                float c = Math.round(255*n);
 
                 int screenIndex = (y * HEIGHT) + x;
                 //System.out.println(c);
@@ -91,7 +91,7 @@ public class Display implements KeyListener {
         }
     }
 
-    private static char getTerrainBlock(double height) {
+    private static char getTerrainBlock(float height) {
         if (height >= 140.0) {
             return Objects.LAND.value;
         } else {
