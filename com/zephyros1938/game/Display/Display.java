@@ -13,6 +13,8 @@ import com.zephyros1938.lib.TimeStamp.TimeStamp;
 import com.zephyros1938.lib.math.PerlinNoise.PerlinNoise;
 import com.zephyros1938.lib.math.Util.Util;
 
+import com.zephyros1938.game.Player.Player;
+
 public class Display implements KeyListener {
     static private Integer WIDTH = 5;
     static private Integer HEIGHT = 5;
@@ -38,6 +40,8 @@ public class Display implements KeyListener {
     static private JFrame window = new JFrame("Game Display");
 
     static private TimeStamp timeStamps = new TimeStamp();
+
+    static private Player player = new Player(0, "Player", HEIGHT, WIDTH);
 
     public static int clamp(int min, int max, int value) {
         return (value < min ? min : value) > max ? max : (value < min ? min : value);
@@ -210,111 +214,6 @@ public class Display implements KeyListener {
 
     /* END INITIALIZATION */
 
-    static private class Player {
-
-        private final Long PLAYER_ID;
-        private final String PLAYER_NAME;
-
-        Player(Long PID, String NAME) {
-            this.PLAYER_ID = PID;
-            this.PLAYER_NAME = NAME;
-        }
-
-        public static class Controller {
-            public static void ControlSwitch(int key) {
-                switch (key) {
-                    case 0: // UP
-                        if (Detection.CanMove(0)) {
-                            playerRow = clamp(0, HEIGHT - 1, playerRow - 1);
-                            Move();
-                            break;
-                        }
-                        System.out.println("Cannot move");
-                        break;
-                    case 1: // DOWN
-                        if (Detection.CanMove(1)) {
-                            playerRow = clamp(0, HEIGHT - 1, playerRow + 1);
-                            Move();
-                            break;
-                        }
-                        System.out.println("Cannot move");
-                        break;
-                    case 2: // LEFT
-                        if (Detection.CanMove(2)) {
-                            playerColumn = clamp(0, WIDTH - 1, playerColumn - 1);
-                            Move();
-                            break;
-                        }
-                        System.out.println("Cannot move");
-                        break;
-                    case 3: // RIGHT
-                        if (Detection.CanMove(3)) {
-                            playerColumn = clamp(0, WIDTH - 1, playerColumn + 1);
-                            Move();
-                            break;
-                        }
-                        System.out.println("Cannot move");
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-            public static void Move() {
-                timeStamps.Start("Moving Player");
-                playerPosition = ((HEIGHT * playerRow) + playerColumn);
-                UpdateScreenBuffer();
-                UpdateScreenVisible();
-                timeStamps.End();
-            }
-
-            static private Map<Integer, Integer> controlKeySet = Map.of(
-                    87, 0,
-                    38, 0,
-                    83, 1,
-                    40, 1,
-                    65, 2,
-                    37, 2,
-                    68, 3,
-                    39, 3);
-        }
-
-        public static class Detection { // something is going wrong here
-            private static Boolean CanMove(int dir) {
-                int targetPosition = playerPosition, targetRow = playerRow, targetColumn = playerColumn;
-                System.out.println(dir);
-                switch (dir) {
-                    case 0: // UP
-                        targetRow = clamp(0, HEIGHT - 1, playerRow - 1);
-                        targetPosition = ((HEIGHT * (targetRow)) + playerColumn);
-                        break;
-                    case 1: // DOWN
-                        targetRow = clamp(0, HEIGHT - 1, playerRow + 1);
-                        targetPosition = ((HEIGHT * (targetRow)) + playerColumn);
-                        break;
-                    case 2: // LEFT
-                        targetColumn = clamp(0, WIDTH - 1, playerColumn - 1);
-                        targetPosition = ((HEIGHT * (playerRow)) + targetColumn);
-                        break;
-                    case 3: // RIGHT
-                        targetColumn = clamp(0, WIDTH - 1, playerColumn + 1);
-                        targetPosition = ((HEIGHT * (playerRow)) + targetColumn);
-                        break;
-                }
-                char targetCell = Screen.get(targetPosition);
-                // System.out.println(playerPosition + " CRW : " + playerRow + " CCL : " +
-                // playerColumn);
-                // System.out.println(targetPosition + " ROW : " + targetRow + " COL : " +
-                // targetColumn);
-                // System.out.println("TCEL : " + targetCell);
-                if (targetCell != Objects.LAND.value) {
-                    return true;
-                }
-                return false;
-            }
-        }
-    }
-
     enum Objects {
         LAND('#'),
         AIR(' '),
@@ -322,13 +221,13 @@ public class Display implements KeyListener {
         ORB('O'),
         ENEMY('Ё'),
         BIGENEMY('Ж');
-
+    
         private final char value;
-
+    
         Objects(char value) {
             this.value = value;
         }
-
+    
         public char getObject() {
             return value;
         }
@@ -339,9 +238,9 @@ public class Display implements KeyListener {
         // Handle key press events here
         System.out.println("Key pressed: " + e.getKeyCode() + e.getKeyChar());
         try {
-            int p = Player.Controller.controlKeySet.get(e.getKeyCode());
-            System.out.println(p);
-            Player.Controller.ControlSwitch(p);
+            int pa = p.c.controlKeySet.get(e.getKeyCode());
+            System.out.println(pa);
+            Player.Controller.ControlSwitch(pa);
         } catch (Exception e1) {
             e1.printStackTrace();
         }
