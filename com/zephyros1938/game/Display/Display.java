@@ -68,27 +68,52 @@ public class Display implements KeyListener {
          * }
          */
 
-        for (int y = 0; y < HEIGHT; y++) {
-            for (int x = 0; x < WIDTH; x++) { //! USE THIS FOR BETTER NOISE RESULTS: https://rtouti.github.io/graphics/perlin-noise-algorithm
-                float xi = x * terrainFrequency, yi = y * terrainFrequency;
+        for (int index = 0; index < SCREEN_SIZE; index++) {
+            int x = index / WIDTH;
+            int y = index % WIDTH;
 
-                float n = (float) (terrainPerlinNoise.noise(xi, yi) * terrainAmplitude);
+            float xi = x * terrainFrequency, yi = y * terrainFrequency;
 
-                n += 1.0;
-                n /= 2.0;
+            float n = terrainPerlinNoise.noise(xi, yi) * terrainAmplitude;
 
-                float c = Math.round(255*n);
+            n += 1.0;
+            n /= 2.0;
 
-                int screenIndex = (y * HEIGHT) + x;
-                //System.out.println(c);
+            float c = Math.round(255 * n);
 
-                if (x == playerColumn && y == playerRow) {
-                    Screen.put(screenIndex, Objects.PLAYER.value);
-                } else {
-                    Screen.put(screenIndex, getTerrainBlock(c));
-                }
+            int screenIndex = (y * HEIGHT) + x;
+            // System.out.println(c);
+
+            if (x == playerColumn && y == playerRow) {
+                Screen.put(screenIndex, Objects.PLAYER.value);
+            } else {
+                Screen.put(screenIndex, getTerrainBlock(c));
             }
         }
+        /* ! OLD CODE FOR REFERENCE !
+         * for (int y = 0; y < HEIGHT; y++) {
+         * for (int x = 0; x < WIDTH; x++) { // ! USE THIS FOR BETTER NOISE RESULTS:
+         * // https://rtouti.github.io/graphics/perlin-noise-algorithm
+         * float xi = x * terrainFrequency, yi = y * terrainFrequency;
+         * 
+         * float n = terrainPerlinNoise.noise(xi, yi) * terrainAmplitude;
+         * 
+         * n += 1.0;
+         * n /= 2.0;
+         * 
+         * float c = Math.round(255 * n);
+         * 
+         * int screenIndex = (y * HEIGHT) + x;
+         * // System.out.println(c);
+         * 
+         * if (x == playerColumn && y == playerRow) {
+         * Screen.put(screenIndex, Objects.PLAYER.value);
+         * } else {
+         * Screen.put(screenIndex, getTerrainBlock(c));
+         * }
+         * }
+         * }
+         */
     }
 
     private static char getTerrainBlock(float height) {
@@ -272,9 +297,11 @@ public class Display implements KeyListener {
                         break;
                 }
                 char targetCell = Screen.get(targetPosition);
-                //System.out.println(playerPosition + " CRW : " + playerRow + " CCL : " + playerColumn);
-                //System.out.println(targetPosition + " ROW : " + targetRow + " COL : " + targetColumn);
-                //System.out.println("TCEL : " + targetCell);
+                // System.out.println(playerPosition + " CRW : " + playerRow + " CCL : " +
+                // playerColumn);
+                // System.out.println(targetPosition + " ROW : " + targetRow + " COL : " +
+                // targetColumn);
+                // System.out.println("TCEL : " + targetCell);
                 if (targetCell != Objects.LAND.value) {
                     return true;
                 }
