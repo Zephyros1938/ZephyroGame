@@ -44,36 +44,39 @@ public class PerlinNoise {
         S = changeTo;
     }
 
+    private static Integer X,Y,aa,ab,ba,bb = 0;
+    private static Float xCoord, yCoord, u, v, gradAA, gradBA, gradAB, gradBB, lerpX1, lerpX2, lerpedValue;
+
     public float noise(float x, float y) {
-        int X = (int) Math.floor(x) & 255; // GET UNIT SQUARE CONTAINING POINT
-        int Y = (int) Math.floor(y) & 255;
+        X = (int) Math.floor(x) & 255; // GET UNIT SQUARE CONTAINING POINT
+        Y = (int) Math.floor(y) & 255;
         //System.out.println("X&Y : " + X + " " + Y);
 
-        float xCoord = (float) Math.floor(x); // RELATIVE XY COORDS WITHIN THE SQUARE
-        float yCoord = (float) Math.floor(y);
+        xCoord = (float) Math.floor(x); // RELATIVE XY COORDS WITHIN THE SQUARE
+        yCoord = (float) Math.floor(y);
 
         x -= xCoord; // RELATIVE XY COORDS WITHIN THE SQUARE
         y -= yCoord;
 
-        float u = Util.fade(x);
-        float v = Util.fade(y);
+        u = Util.fade(x);
+        v = Util.fade(y);
 
         // HASH 4 CORNERS
-        int aa = perm[X + perm[Y]] & 3;
-        int ab = perm[X + perm[Y + 1]] & 3;
-        int ba = perm[X + 1 + perm[Y]] & 3;
-        int bb = perm[X + 1 + perm[Y + 1]] & 3;
+        aa = perm[X + perm[Y]] & 3;
+        ab = perm[X + perm[Y + 1]] & 3;
+        ba = perm[X + 1 + perm[Y]] & 3;
+        bb = perm[X + 1 + perm[Y + 1]] & 3;
 
         // ADD BLEND RESULTS FROM 4 CORNERS OF SQUARE
-        float gradAA = Util.dot(grad2[aa], x, y);
-        float gradBA = Util.dot(grad2[ba], x - 1, y);
-        float gradAB = Util.dot(grad2[ab], x, y - 1);
-        float gradBB = Util.dot(grad2[bb], x - 1, y - 1);
+        gradAA = Util.dot(grad2[aa], x, y);
+        gradBA = Util.dot(grad2[ba], x - 1, y);
+        gradAB = Util.dot(grad2[ab], x, y - 1);
+        gradBB = Util.dot(grad2[bb], x - 1, y - 1);
 
-        float lerpX1 = Util.lerp(u, gradAA, gradBA);
-        float lerpX2 = Util.lerp(u, gradAB, gradBB);
+        lerpX1 = Util.lerp(u, gradAA, gradBA);
+        lerpX2 = Util.lerp(u, gradAB, gradBB);
 
-        float lerpedValue = Util.lerp(v, lerpX1, lerpX2);
+        lerpedValue = Util.lerp(v, lerpX1, lerpX2);
 
         /* // DEBUG
          * System.out.println(
