@@ -58,6 +58,8 @@ public class Display implements KeyListener {
     }
 
     private static void UpdateScreenBuffer() {
+        int x, y, screenIndex;
+        float xi, yi, n, c;
         /*
          * for (int i = 0; i < SCREEN_SIZE; i++) {
          * if (i == playerPosition) {
@@ -69,19 +71,20 @@ public class Display implements KeyListener {
          */
 
         for (int index = 0; index < SCREEN_SIZE; index++) {
-            int x = index / WIDTH;
-            int y = index % WIDTH;
+            x = index / WIDTH;
+            y = index % WIDTH;
 
-            float xi = x * terrainFrequency, yi = y * terrainFrequency;
+            xi = x * terrainFrequency;
+            yi = y * terrainFrequency;
 
-            float n = terrainPerlinNoise.noise(xi, yi) * terrainAmplitude;
+            n = terrainPerlinNoise.noise(xi, yi) * terrainAmplitude;
 
             n += 1.0;
             n /= 2.0;
 
-            float c = Math.round(255 * n);
+            c = Math.round(255 * n);
 
-            int screenIndex = (y * HEIGHT) + x;
+            screenIndex = (y * HEIGHT) + x;
             // System.out.println(c);
 
             if (x == playerColumn && y == playerRow) {
@@ -90,7 +93,8 @@ public class Display implements KeyListener {
                 Screen.put(screenIndex, getTerrainBlock(c));
             }
         }
-        /* ! OLD CODE FOR REFERENCE !
+        /*
+         * ! OLD CODE FOR REFERENCE !
          * for (int y = 0; y < HEIGHT; y++) {
          * for (int x = 0; x < WIDTH; x++) { // ! USE THIS FOR BETTER NOISE RESULTS:
          * // https://rtouti.github.io/graphics/perlin-noise-algorithm
@@ -137,8 +141,8 @@ public class Display implements KeyListener {
     }
 
     public static void UpdateScreenVisible() throws NullPointerException {
-        ScreenText = new StringBuilder();
-        ScreenText.append(FontStyle);
+        ScreenText.setLength(0);
+        ScreenText.append("<pre>");
         for (Integer id = 0; id < SCREEN_SIZE; id++) {
             // System.out.println(id * WIDTH + " " + (id + 1) * WIDTH); // debug the indexes
             // for the screen
@@ -149,9 +153,10 @@ public class Display implements KeyListener {
                 ScreenText.append("<br>");
             }
         }
-        ScreenText.append("</pre><br>PC: " + playerColumn + " PR: " + playerRow + " PP: " + playerPosition
-                + "</body></html>");
+        //ScreenText.append("</pre><br>PC: " + playerColumn + " PR: " + playerRow + " PP: " + playerPosition
+        //        + "</body></html>");
         // System.out.println(ScreenText);
+        ScreenText.append("</pre>");
         jTextAreaBoard.setText(ScreenText.toString());
     }
 

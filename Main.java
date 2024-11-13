@@ -1,8 +1,8 @@
 import com.zephyros1938.game.Display.Display;
 
 public class Main {
-    private static int WIDTH = 45;
-    private static int HEIGHT = 45;
+    private static int WIDTH = 55;
+    private static int HEIGHT = 55;
 
     private static Display display = new Display(WIDTH, HEIGHT, 1920, 1080);
 
