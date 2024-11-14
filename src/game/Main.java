@@ -1,6 +1,6 @@
-package src.game;
+package game;
 
-import src.game.Display.Display;
+import game.Display.Display;
 
 public class Main {
     private static int WIDTH = 55;
