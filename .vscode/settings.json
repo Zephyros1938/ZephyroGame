@@ -1,0 +1,8 @@
+{
+    "cSpell.words": [
+        "GLFW"
+    ],
+    "java.project.referencedLibraries": [
+        "lib/*.jar"
+    ]
+}

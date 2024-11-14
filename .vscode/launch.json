@@ -1,0 +1,12 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Launch LWJGL Project",
+            "request": "launch",
+            "mainClass": "Main",  // Replace with your main class name
+            "vmArgs": "-Djava.library.path=lib/",  // Adjust for your platform
+        }
+    ]
+}

@@ -1,4 +1,4 @@
-import com.zephyros1938.game.Display.Display;
+import lib.com.zephyros1938.game.Display.Display;
 
 public class Main {
     private static int WIDTH = 55;
@@ -9,8 +9,7 @@ public class Main {
     @SuppressWarnings("static-access")
     public static void main(String[] args) throws Exception {
         System.out.println(WIDTH * HEIGHT + " SIZE");
-        display.Initialize();
 
-        //System.out.println((0b0101 + (~0b0111)) + " " + (5 - 8));
+        display.Initialize();
     }
 }
