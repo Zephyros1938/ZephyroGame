@@ -1,15 +1,15 @@
-package src.lib.math.Shapes.LWJGL;
+package lib.math.Shapes.LWJGL;
 
-import src.lib.math.Shapes.Shapes.*;
+import lib.math.Shapes.Shapes.*;
 
-public class ShapesLWJGL extends src.lib.math.Vector.Vector {
+public class ShapesLWJGL extends lib.math.Vector.Vector {
     public static class TriangleData {
         public Triangle vert;
-        public Pyramid col;
+        public Float[] col = new Float[12];
 
-        public TriangleData(Triangle vert, Pyramid col){
+        public TriangleData(Triangle vert, Pentatope col){
             this.vert = vert;
-            this.col = col;
+            this.col = col.toFloatArray();
         }
     }
 }

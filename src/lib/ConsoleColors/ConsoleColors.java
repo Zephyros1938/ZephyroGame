@@ -1,4 +1,4 @@
-package src.lib.ConsoleColors;
+package lib.ConsoleColors;
 
 // from https://stackoverflow.com/a/45444716
 

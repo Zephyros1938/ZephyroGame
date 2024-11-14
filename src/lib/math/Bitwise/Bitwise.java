@@ -1,4 +1,4 @@
-package src.lib.math.Bitwise;
+package lib.math.Bitwise;
 
 import java.lang.NumberFormatException;
 

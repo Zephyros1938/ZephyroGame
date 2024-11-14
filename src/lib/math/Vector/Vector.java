@@ -1,4 +1,4 @@
-package src.lib.math.Vector;
+package lib.math.Vector;
 
 public class Vector {
 
@@ -141,7 +141,7 @@ public class Vector {
 
         /* CONSTRUCTORS */
 
-        Vector4(Float x, Float y, Float z, Float w) {
+        public Vector4(Float x, Float y, Float z, Float w) {
             this.x = x;
             this.y = y;
             this.z = z;

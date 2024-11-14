@@ -1,6 +1,6 @@
-package src.game.Player;
+package game.Player;
 
-import src.lib.math.Util.Util;
+import lib.math.Util.Util;
 
 public class Player {
 

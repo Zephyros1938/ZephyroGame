@@ -1,4 +1,4 @@
-package src.lib.TimeStamp;
+package lib.TimeStamp;
 
 public class TimeStamp {
 
