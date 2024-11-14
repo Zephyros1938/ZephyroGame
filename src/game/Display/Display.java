@@ -1,7 +1,5 @@
 package game.Display;
 
-import java.nio.CharBuffer;
-
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
@@ -17,7 +15,7 @@ public class Display {
     static private Integer SCREEN_WIDTH;
     static private Integer SCREEN_HEIGHT;
 
-    static private final Float Xdim = 16f, Ydim = 16f;
+    static private final Float Xdim = 6f, Ydim = 4f;
 
     static public Integer[] Screen = new Integer[(int) (Xdim * Ydim)];
 
@@ -31,22 +29,21 @@ public class Display {
 
     static private TriangleData[] Tris = new TriangleData[(int) (Xdim * Ydim)];
 
+    static final Float incrX = (1f / Xdim);
+    static final Float incrY = (1f / Ydim);
+
     static void DrawTriangle(float x, float y, int ID) {
 
-        x *= 2f/Xdim;
-        y *= 2f/Ydim;
+        x *= 2f / Xdim;
+        y *= 2f / Ydim;
 
-        x-=.75f;
-        y-=.75f;
-        
-        //x -= 1.f;
-        //y -= 1.f;
-        System.out.println(ID + " " + x + " " + y);
+        x -= 1f - incrX;
+        y -= 1f - incrY;
 
-        //x-=1f;
-        //y-=1f;
-
-        final Shapes.Triangle triVec = shapesInstance.new Triangle(x-.25f,y-.25f,x+.25f,y-.25f,x,y+.25f);
+        final Shapes.Triangle triVec = shapesInstance.new Triangle(
+                x - incrX, y - incrY,
+                x + incrX, y - incrY,
+                x, y + incrY);
 
         Tris[ID] = new TriangleData(triVec, TriDefaultColor);
     }
@@ -55,8 +52,7 @@ public class Display {
         for (Integer bit = 0; bit < Screen.length; bit++) {
             float XU = bit % (Xdim);
             float YU = (float) Math.floor((bit) / Xdim);
-            System.out.println("YU: "+ YU);
-            DrawTriangle(XU,YU,bit);
+            DrawTriangle(XU, YU, bit);
         }
         System.out.println("Display Created");
         SCREEN_WIDTH = SCREEN_X;
