@@ -5,7 +5,7 @@
             "type": "java",
             "name": "Launch LWJGL Project",
             "request": "launch",
-            "mainClass": "Main",  // Replace with your main class name
+            "mainClass": "src.game.Main",  // Replace with your main class name
             "vmArgs": "-Djava.library.path=lib/",  // Adjust for your platform
         }
     ]

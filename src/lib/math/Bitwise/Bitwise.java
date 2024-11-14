@@ -1,4 +1,4 @@
-package lib.com.zephyros1938.lib.math.Bitwise;
+package src.lib.math.Bitwise;
 
 import java.lang.NumberFormatException;
 

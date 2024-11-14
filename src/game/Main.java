@@ -1,4 +1,6 @@
-import lib.com.zephyros1938.game.Display.Display;
+package src.game;
+
+import src.game.Display.Display;
 
 public class Main {
     private static int WIDTH = 55;

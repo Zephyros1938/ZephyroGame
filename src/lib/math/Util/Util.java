@@ -1,4 +1,4 @@
-package lib.com.zephyros1938.lib.math.Util;
+package src.lib.math.Util;
 
 public class Util {
     public static int clampInt(int val, int min, int max) {

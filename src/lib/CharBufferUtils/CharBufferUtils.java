@@ -1,4 +1,4 @@
-package lib.com.zephyros1938.lib.CharBufferUtils;
+package src.lib.CharBufferUtils;
 
 import java.nio.CharBuffer;
 

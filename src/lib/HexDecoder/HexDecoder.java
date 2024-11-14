@@ -1,4 +1,4 @@
-package lib.com.zephyros1938.lib.HexDecoder;
+package src.lib.HexDecoder;
 
 public class HexDecoder {
     public static int[] Bit_24(int x) {

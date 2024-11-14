@@ -1,4 +1,4 @@
-package lib.com.zephyros1938.lib.TimeStamp;
+package src.lib.TimeStamp;
 
 public class TimeStamp {
 

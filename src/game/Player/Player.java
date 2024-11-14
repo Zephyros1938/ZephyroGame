@@ -1,10 +1,10 @@
-package lib.com.zephyros1938.game.Player;
+package src.game.Player;
 
 import java.lang.reflect.Method;
 import java.util.Map;
 
-import lib.com.zephyros1938.game.Display.Display;
-import lib.com.zephyros1938.lib.math.Util.Util;
+import src.game.Display.Display;
+import src.lib.math.Util.Util;
 
 public class Player {
 

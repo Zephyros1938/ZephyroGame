@@ -1,12 +1,16 @@
-package lib.com.zephyros1938.game.Display;
+package src.game.Display;
 
 import java.nio.CharBuffer;
 
-import lib.com.zephyros1938.lib.math.PerlinNoise.PerlinNoise;
-
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
+import org.lwjgl.opengl.GL11;
+
+import src.lib.math.PerlinNoise.PerlinNoise;
+import src.lib.math.Shapes.Shapes;
+import src.lib.math.Shapes.Shapes.*;
+import src.lib.math.Vector.Vector;
+import src.lib.math.Vector.Vector.Vector2;
 
 public class Display {
     private static long window;
@@ -23,9 +27,11 @@ public class Display {
 
     static public CharBuffer Screen;
 
-    public static int clamp(int min, int max, int value) {
-        return (value < min ? min : value) > max ? max : (value < min ? min : value);
-    }
+    static Shapes shapesInstance = new Shapes();
+
+    static private Triangle[] Tris = {
+            shapesInstance.new Triangle(new Vector2(-0.5f, -0.5f), new Vector2(0.5f, -0.5f), new Vector2(0.0f, 0.5f))
+    };
 
     public Display(int H, int W, int SCREEN_X, int SCREEN_Y) {
         System.out.println("Display Created");
@@ -33,15 +39,6 @@ public class Display {
         WIDTH = W;
         SCREEN_WIDTH = SCREEN_X;
         SCREEN_HEIGHT = SCREEN_Y;
-
-    }
-
-    private static char getTerrainBlock(float height) {
-        if (height >= 140.0) {
-            return Objects.LAND.value;
-        } else {
-            return Objects.AIR.value;
-        }
     }
 
     public void Initialize() {
@@ -56,34 +53,33 @@ public class Display {
         }
 
         GLFW.glfwMakeContextCurrent(window);
+
+        GL.createCapabilities();
+
         GLFW.glfwShowWindow(window);
         GLFW.glfwSwapInterval(1);
 
         while (!GLFW.glfwWindowShouldClose(window)) {
             GLFW.glfwPollEvents();
 
+            for (Triangle triangle : Tris) {
+                GL11.glBegin(GL11.GL_TRIANGLES);
+
+                GL11.glColor3f(1.0f, 0.0f, 0.0f);
+                GL11.glVertex2f(triangle.P1.x, triangle.P1.y);
+
+                GL11.glColor3f(0.0f, 1.0f, 0.0f);
+                GL11.glVertex2f(triangle.P2.x, triangle.P2.y);
+
+                GL11.glColor3f(0.0f, 0.0f, 1.0f);
+                GL11.glVertex2f(triangle.P3.x, triangle.P3.y);
+
+                GL11.glEnd();
+            }
+
             GLFW.glfwSwapBuffers(window);
         }
-    }
 
-    /* END INITIALIZATION */
-
-    enum Objects {
-        LAND('#'),
-        AIR(' '),
-        PLAYER('Y'),
-        ORB('O'),
-        ENEMY('Ё'),
-        BIGENEMY('Ж');
-
-        private final char value;
-
-        Objects(char value) {
-            this.value = value;
-        }
-
-        public char getObject() {
-            return value;
-        }
+        GLFW.glfwDestroyWindow(window);
     }
 }

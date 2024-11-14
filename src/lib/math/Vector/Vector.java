@@ -1,20 +1,20 @@
-package lib.com.zephyros1938.lib.math.Vector;
+package src.lib.math.Vector;
 
 public class Vector {
 
     public static class Vector2 {
 
-        public double x;
-        public double y;
+        public Float x;
+        public Float y;
 
         /* CONSTRUCTORS */
 
-        public Vector2(double x, double y) {
+        public Vector2(Float x, Float y) {
             this.x = x;
             this.y = y;
         }
 
-        public static Vector2[] fromArray(double[] values) {
+        public static Vector2[] fromArray(Float[] values) {
             if (values.length % 2 != 0) {
                 throw new IllegalArgumentException("Array length must be even to create Vector2 pairs.");
             }
@@ -40,26 +40,26 @@ public class Vector {
             return new Vector2(this.x * other.x, this.y * other.y);
         }
 
-        public Vector2 dot(double scalar) {
+        public Vector2 dot(Float scalar) {
             return new Vector2(this.x * scalar, this.y * scalar);
         }
 
-        public double magnitude() {
-            return Math.sqrt(this.x * this.x + this.y * this.y);
+        public Float magnitude() {
+            return (float) Math.sqrt(this.x * this.x + this.y * this.y);
         }
 
         public Vector2 normal() {
-            double mag = magnitude();
+            Float mag = magnitude();
             if (mag == 0) {
-                return new Vector2(0, 0);
+                return new Vector2(0.0f, 0.0f);
             }
             return new Vector2(this.x / mag, this.y / mag);
         }
 
         public Vector2 randomUnitVector() {
-            double theta = 2 * Math.PI * Math.random();
-            double uv_x = Math.sin(theta);
-            double uv_y = Math.cos(theta);
+            Float theta = (float) (2 * Math.PI * Math.random());
+            Float uv_x = (float) Math.sin(theta);
+            Float uv_y = (float) Math.cos(theta);
 
             Vector2 uv = new Vector2(uv_x, uv_y);
 
@@ -73,19 +73,19 @@ public class Vector {
     }
 
     public static class Vector3 {
-        public double x;
-        public double y;
-        public double z;
+        public Float x;
+        public Float y;
+        public Float z;
 
         /* CONSTRUCTORS */
 
-        public Vector3(double x, double y, double z) {
+        public Vector3(Float x, Float y, Float z) {
             this.x = x;
             this.y = y;
             this.z = z;
         };
 
-        public static Vector3[] fromArray(double[] values) {
+        public static Vector3[] fromArray(Float[] values) {
             if (values.length % 3 != 0) {
                 throw new IllegalArgumentException("Array length must be a multiple of 3 to create Vector3 pairs.");
             }
@@ -111,18 +111,18 @@ public class Vector {
             return new Vector3(this.x * other.x, this.y * other.y, this.z * other.z);
         }
 
-        public Vector3 dot(double scalar) {
+        public Vector3 dot(Float scalar) {
             return new Vector3(this.x * scalar, this.y * scalar, this.z * scalar);
         }
 
-        public double magnitude() {
-            return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
+        public Float magnitude() {
+            return (float) Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
         }
 
         public Vector3 normalize() {
-            double mag = magnitude();
+            Float mag = magnitude();
             if (mag == 0) {
-                return new Vector3(0, 0, 0);
+                return new Vector3(0.0f, 0.0f, 0.0f);
             }
             return new Vector3(this.x / mag, this.y / mag, this.z / mag);
         }
@@ -134,21 +134,21 @@ public class Vector {
     }
 
     public static class Vector4 {
-        public double x;
-        public double y;
-        public double z;
-        public double w;
+        public Float x;
+        public Float y;
+        public Float z;
+        public Float w;
 
         /* CONSTRUCTORS */
 
-        Vector4(double x, double y, double z, double w) {
+        Vector4(Float x, Float y, Float z, Float w) {
             this.x = x;
             this.y = y;
             this.z = z;
             this.w = w;
         };
 
-        public static Vector4[] fromArray(double[] values) {
+        public static Vector4[] fromArray(Float[] values) {
             if (values.length % 4 != 0) {
                 throw new IllegalArgumentException("Array length must be a multiple of 4 to create Vector4 pairs.");
             }
@@ -174,18 +174,18 @@ public class Vector {
             return new Vector4(this.x * other.x, this.y * other.y, this.z * other.z, this.w * other.w);
         }
 
-        public Vector4 dot(double scalar) {
+        public Vector4 dot(Float scalar) {
             return new Vector4(this.x * scalar, this.y * scalar, this.z * scalar, this.w * scalar);
         }
 
-        public double magnitude() {
-            return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w);
+        public Float magnitude() {
+            return (float) Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w);
         }
 
         public Vector4 normalize() {
-            double mag = magnitude();
+            Float mag = magnitude();
             if (mag == 0) {
-                return new Vector4(0, 0, 0, 0);
+                return new Vector4(0.0f, 0.0f, 0.0f, 0.0f);
             }
             return new Vector4(this.x / mag, this.y / mag, this.z / mag, this.w / mag);
         }

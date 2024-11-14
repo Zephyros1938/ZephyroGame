@@ -1,4 +1,4 @@
-package lib.com.zephyros1938.lib.math.PerlinNoise;
+package src.lib.math.PerlinNoise;
 
 /*
  * RESOURCES:
@@ -7,7 +7,7 @@ package lib.com.zephyros1938.lib.math.PerlinNoise;
 
 import java.util.Random;
 
-import lib.com.zephyros1938.lib.math.Util.Util;
+import src.lib.math.Util.Util;
 
 public class PerlinNoise {
     private static final int GRADIENT_SIZE = 256;
