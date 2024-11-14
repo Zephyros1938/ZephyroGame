@@ -30,7 +30,7 @@ public class Display {
     static Shapes shapesInstance = new Shapes();
 
     static private Triangle[] Tris = {
-            shapesInstance.new Triangle(new Vector2(-0.5f, -0.5f), new Vector2(0.5f, -0.5f), new Vector2(0.0f, 0.5f))
+            shapesInstance.new Triangle(new Float[] { -0.5f, -0.5f, 0.5f, -0.5f, 0.0f, 0.5f })
     };
 
     public Display(int H, int W, int SCREEN_X, int SCREEN_Y) {
