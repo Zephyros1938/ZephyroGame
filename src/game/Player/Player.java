@@ -1,9 +1,5 @@
 package src.game.Player;
 
-import java.lang.reflect.Method;
-import java.util.Map;
-
-import src.game.Display.Display;
 import src.lib.math.Util.Util;
 
 public class Player {
