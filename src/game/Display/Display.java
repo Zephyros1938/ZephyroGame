@@ -6,8 +6,7 @@ import java.io.IOException;
 
 import java.nio.FloatBuffer;
 
-import java.util.Arrays;
-
+import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFW;
 
 import org.lwjgl.opengl.GL;
@@ -15,9 +14,6 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
-import org.lwjgl.system.MemoryStack;
-
-import lib.math.Shapes.LWJGL.ShapesLWJGL.TriangleData;
 
 public class Display {
     private static long window;
@@ -28,81 +24,42 @@ public class Display {
 
     static public Integer Screen = (int) (Xdim * Ydim);
 
-    final static Float[] TriRGB = new Float[] {
-            1.0f, 0.0f, 0.0f, 0.0f,
-            0.0f, 1.0f, 0.0f, 0.0f,
-            0.0f, 0.0f, 1.0f, 0.0f };
-    final static Float[] TriYCM = new Float[] {
-            1.0f, 1.0f, 0.0f, 0.0f,
-            0.0f, 1.0f, 1.0f, 0.0f,
-            1.0f, 0.0f, 1.0f, 0.0f };
-
-    static private TriangleData[] Tris = new TriangleData[(int) (Xdim * Ydim)];
-
     static final Float incrX = (1f / Xdim);
     static final Float incrY = (1f / Ydim);
 
     static final Integer SHADER_VERT_COUNT = 3;
     static final Integer SHADER_COORD_LEN = 2;
-    static final Integer SHADER_COLOR_LEN = 4;
     static final Integer SHADER_SIDE_LEN = 1;
-    static final Integer SHADER_ATTRIBUTE_LEN = SHADER_COORD_LEN + SHADER_COLOR_LEN + SHADER_SIDE_LEN;
+    static final Integer SHADER_ATTRIBUTE_LEN = SHADER_COORD_LEN + SHADER_SIDE_LEN;
     static final Integer SHADER_TOTAL_LEN = SHADER_ATTRIBUTE_LEN * SHADER_VERT_COUNT;
-    
+
     static private float[] vertices = new float[(int) (Xdim * Ydim) * SHADER_TOTAL_LEN];
-    static final private FloatBuffer vertexBuffer = MemoryStack.stackMallocFloat(vertices.length);
+    static final private FloatBuffer vertexBuffer = BufferUtils.createFloatBuffer(vertices.length);
 
     static int index = 0;
 
     static void DrawTriangle(float x, float y, int ID) {
 
-        x *= 2f / Xdim;
-        y *= 2f / Ydim;
+        // Transform to NDC coordinates
+        x = x * 2f / Xdim - 1f;
+        y = y * 2f / Ydim - 1f;
 
-        x -= 1f;
-        y -= 1f;
-
-        Float[] vert = new Float[] {
+        float[] vert = {
                 x, y,
-                x, y + (incrY * 2),
-                x + (incrX * 2), y + (incrY * 2) };
-        
-        Float[] side = new Float[] { 0f, 0f, 0f };
-        Float[] col = TriRGB;
+                x, y + incrY * 2,
+                x + incrX * 2, y + incrY * 2
+        };
 
-        if (ID % 2 == 0) {
-        } else {
-            side = new Float[] { 1f, 1f, 1f };
-            col = TriYCM;
+        float[] side = new float[]{0f,1f,2f};
+        if(ID%2==1){
+            side = new float[]{3f,4f,5f};
         }
 
-        // First point of triangle
-        vertices[index++] = vert[0];
-        vertices[index++] = vert[1];
-        vertices[index++] = col[0];
-        vertices[index++] = col[1];
-        vertices[index++] = col[2];
-        vertices[index++] = col[3];
-        vertices[index++] = side[0];
-
-        // Second point of triangle
-        vertices[index++] = vert[2];
-        vertices[index++] = vert[3];
-        vertices[index++] = col[4];
-        vertices[index++] = col[5];
-        vertices[index++] = col[6];
-        vertices[index++] = col[7];
-        vertices[index++] = side[1];
-
-        // Third point of triangle
-        vertices[index++] = vert[4];
-        vertices[index++] = vert[5];
-        vertices[index++] = col[8];
-        vertices[index++] = col[9];
-        vertices[index++] = col[10];
-        vertices[index++] = col[11];
-        vertices[index++] = side[2];
-        System.err.println("TRIANGLE ID " + ID + ":\n\tVERT: " + Arrays.toString(vert) + "\n\tCOLOR: " + Arrays.toString(col) + "\n\tSIDE: " + Arrays.toString(side));
+        for (int i = 0; i < SHADER_VERT_COUNT; i++) {
+            vertices[index++] = vert[i * 2];       // X
+            vertices[index++] = vert[i * 2 + 1];   // Y
+            vertices[index++] = side[i];           // Side (color flag)
+        }
     }
 
     public Display(int H, int W, int SCREEN_X, int SCREEN_Y) {
@@ -116,6 +73,16 @@ public class Display {
         SCREEN_HEIGHT = SCREEN_Y;
 
         vertexBuffer.put(vertices).flip();
+
+        for (int i = 0; i < vertices.length / SHADER_TOTAL_LEN; i++) {
+            int base = i * SHADER_ATTRIBUTE_LEN;
+            System.out.printf("Triangle %d:\n", i);
+            for (int v = 0; v < SHADER_VERT_COUNT; v++) {
+                int offset = base + v * SHADER_ATTRIBUTE_LEN;
+                System.out.printf("\tVertex %d: X=%.2f, Y=%.2f, Side=%.2f\n",
+                        v, vertices[offset], vertices[offset + 1], vertices[offset + 2]);
+            }
+        }
     }
 
     public void Initialize() throws IOException {
@@ -140,52 +107,21 @@ public class Display {
         GL30.glBindVertexArray(vao);
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
 
-        // float[] vertices = new float[Tris.length * SHADER_TOTAL_LEN]; // 3 vertecies per triangle
-        // 2 for coordinates
-        // 4 for colors
-        // 3 for side
-        // 23 floats total
-        // int index = 0;
-        // for (TriangleData Obj : Tris) {
-        //     vertices[index++] = Obj.vert[0];
-        //     vertices[index++] = Obj.vert[1];
-        //     vertices[index++] = Obj.col[0];
-        //     vertices[index++] = Obj.col[1];
-        //     vertices[index++] = Obj.col[2];
-        //     vertices[index++] = Obj.col[3];
-        //     vertices[index++] = Obj.side[0];
-
-        //     vertices[index++] = Obj.vert[2];
-        //     vertices[index++] = Obj.vert[3];
-        //     vertices[index++] = Obj.col[4];
-        //     vertices[index++] = Obj.col[5];
-        //     vertices[index++] = Obj.col[6];
-        //     vertices[index++] = Obj.col[7];
-        //     vertices[index++] = Obj.side[1];
-
-        //     vertices[index++] = Obj.vert[4];
-        //     vertices[index++] = Obj.vert[5];
-        //     vertices[index++] = Obj.col[8];
-        //     vertices[index++] = Obj.col[9];
-        //     vertices[index++] = Obj.col[10];
-        //     vertices[index++] = Obj.col[11];
-        //     vertices[index++] = Obj.side[2];
-        // }
-
         // data -> VBO
         GL15.glBufferData(GL15.GL_ARRAY_BUFFER, vertexBuffer, GL15.GL_STATIC_DRAW);
 
         // positions
-        GL20.glVertexAttribPointer(0, SHADER_VERT_COUNT, GL11.GL_FLOAT, false, 6 * Float.BYTES, 0);
+        GL20.glVertexAttribPointer(0, 2, GL11.GL_FLOAT, false, SHADER_ATTRIBUTE_LEN * Float.BYTES, 0);
         GL20.glEnableVertexAttribArray(0);
 
-        // colors
-        GL20.glVertexAttribPointer(1, SHADER_COLOR_LEN, GL11.GL_FLOAT, false, 6 * Float.BYTES, 2 * Float.BYTES);
+        // side
+        GL20.glVertexAttribPointer(1, SHADER_SIDE_LEN, GL11.GL_FLOAT, false, SHADER_ATTRIBUTE_LEN * Float.BYTES, 2 * Float.BYTES);
         GL20.glEnableVertexAttribArray(1);
 
-        // side
-        // GL20.glVertexAttribPointer(2, SHADER_SIDE_LEN, GL11.GL_FLOAT, false, 6 * Float.BYTES, 6 * Float.BYTES);
-        // GL20.glEnableVertexAttribArray(2);
+        for (int i = 0; i < vertexBuffer.limit(); i += SHADER_ATTRIBUTE_LEN) {
+            System.out.printf("Vertex: X=%.2f, Y=%.2f, Side=%.2f\n",
+                vertexBuffer.get(i), vertexBuffer.get(i + 1), vertexBuffer.get(i + 2));
+        }        
 
         // render loop
         while (!GLFW.glfwWindowShouldClose(window)) {
@@ -193,7 +129,7 @@ public class Display {
 
             // draw triangles
             GL30.glBindVertexArray(vao);
-            GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, vertices.length / 9);
+            GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, vertices.length / SHADER_ATTRIBUTE_LEN);
 
             GLFW.glfwSwapBuffers(window);
             GLFW.glfwPollEvents();
