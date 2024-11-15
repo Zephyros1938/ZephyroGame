@@ -3,18 +3,16 @@ package game.Display;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Arrays;
 
-import org.lwjgl.opengl.GL20;
 import org.lwjgl.glfw.GLFW;
 
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL15;
+import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GL30;
 
-import lib.math.Shapes.Shapes;
-
-import lib.math.Shapes.LWJGL.ShapesLWJGL;
 import lib.math.Shapes.LWJGL.ShapesLWJGL.TriangleData;
 
 public class Display {
@@ -26,30 +24,52 @@ public class Display {
 
     static public Integer[] Screen = new Integer[(int) (Xdim * Ydim)];
 
-    final static Float[] TriDefaultColor = new Float[]{
+    final static Float[] TriDefaultColor = new Float[] {
             1.0f, 0.0f, 0.0f, 0.0f,
             0.0f, 1.0f, 0.0f, 0.0f,
-            0.0f, 0.0f, 1.0f, 0.0f};
+            0.0f, 0.0f, 1.0f, 0.0f };
 
-    static private TriangleData[] Tris = new TriangleData[(int) (Xdim * Ydim)];
+    static private TriangleData[] Tris = new TriangleData[(int) (Xdim * Ydim) * 2];
 
     static final Float incrX = (1f / Xdim);
     static final Float incrY = (1f / Ydim);
 
     static void DrawTriangle(float x, float y, int ID) {
+        float x2 = x, x1 = x;
+        float y2 = y, y1 = y;
 
-        x *= 2f / Xdim;
-        y *= 2f / Ydim;
+        x1 *= 2f / Xdim;
+        y1 *= 2f / Ydim;
 
-        x -= 1f - incrX;
-        y -= 1f - incrY;
+        x1 -= 1f + (incrX);
+        y1 -= 1f + (incrY);
+        x1 += incrX;
+        y1 += incrY;
 
-        Float[] vert = new Float[]{
-                x - incrX, y - incrY,
-                x + incrX, y - incrY,
-                x, y + incrY};
+        Float[] vert = new Float[] {
+                x1, y1,
+                x1, y1 + (incrY * 2),
+                x1 + (incrX * 2), y1 + (incrY * 2) };
 
-        Tris[ID] = new TriangleData(vert, TriDefaultColor);
+        Tris[ID] = new TriangleData(vert, 0f);
+        ID++;
+
+        x2 *= 2f / Xdim;
+        y2 *= 2f / Ydim;
+
+        x2 -= 1f + (incrX);
+        y2 -= 1f + (incrY);
+        x2 += incrX;
+        y2 += incrY;
+
+        Float[] vert_s2 = new Float[] {
+                x2, y2,
+                x2 + (incrX * 2), y2 + (incrY * 2),
+                x2, y2 + (incrY * 2) };
+
+        Tris[ID] = new TriangleData(vert_s2, 1f);
+
+        System.out.printf("Triangle %d created with vertices %s and ID %f%n", ID - 1, Arrays.toString(vert), 0f);
     }
 
     public Display(int H, int W, int SCREEN_X, int SCREEN_Y) {
@@ -85,30 +105,24 @@ public class Display {
         GL30.glBindVertexArray(vao);
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
 
-        float[] vertices = new float[Tris.length * 18]; // each triangle has 3 vertices, each vertex has 6 floats (2 for
-                                                        // position, 4 for color)
+        float[] vertices = new float[Tris.length * 9]; // 3 vertices per triangle, 3 floats per vertex (x, y, side)
         int index = 0;
         for (TriangleData Obj : Tris) {
+            if (Obj == null) {
+                System.out.println("Tris array contains null entries");
+                continue;
+            }
             vertices[index++] = Obj.vert[0];
             vertices[index++] = Obj.vert[1];
-            vertices[index++] = Obj.col[0];
-            vertices[index++] = Obj.col[1];
-            vertices[index++] = Obj.col[2];
-            vertices[index++] = Obj.col[3];
+            vertices[index++] = Obj.side;
 
             vertices[index++] = Obj.vert[2];
             vertices[index++] = Obj.vert[3];
-            vertices[index++] = Obj.col[4];
-            vertices[index++] = Obj.col[5];
-            vertices[index++] = Obj.col[6];
-            vertices[index++] = Obj.col[7];
+            vertices[index++] = Obj.side;
 
             vertices[index++] = Obj.vert[4];
             vertices[index++] = Obj.vert[5];
-            vertices[index++] = Obj.col[8];
-            vertices[index++] = Obj.col[9];
-            vertices[index++] = Obj.col[10];
-            vertices[index++] = Obj.col[11];
+            vertices[index++] = Obj.side;
         }
 
         // data -> VBO

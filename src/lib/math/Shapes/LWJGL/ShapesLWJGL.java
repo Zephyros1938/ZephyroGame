@@ -5,11 +5,11 @@ import lib.math.Shapes.Shapes.*;
 public class ShapesLWJGL extends lib.math.Vector.Vector {
     public static class TriangleData {
         public Float[] vert;
-        public Float[] col;
+        public Float side;
 
-        public TriangleData(Float[] vert, Float[] col){
+        public TriangleData(Float[] vert, Float side){
             this.vert = vert;
-            this.col = col;
+            this.side = side;
         }
     }
 }
