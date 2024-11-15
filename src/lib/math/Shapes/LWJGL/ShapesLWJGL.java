@@ -1,14 +1,14 @@
 package lib.math.Shapes.LWJGL;
 
-import lib.math.Shapes.Shapes.*;
-
-public class ShapesLWJGL extends lib.math.Vector.Vector {
+public class ShapesLWJGL {
     public static class TriangleData {
         public Float[] vert;
-        public Float side;
+        public Float[] col;
+        public Float[] side;
 
-        public TriangleData(Float[] vert, Float side){
+        public TriangleData(Float[] vert, Float[] col, Float[] side){
             this.vert = vert;
+            this.col = col;
             this.side = side;
         }
     }
