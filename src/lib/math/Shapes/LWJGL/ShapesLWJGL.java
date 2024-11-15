@@ -4,12 +4,12 @@ import lib.math.Shapes.Shapes.*;
 
 public class ShapesLWJGL extends lib.math.Vector.Vector {
     public static class TriangleData {
-        public Triangle vert;
-        public Float[] col = new Float[12];
+        public Float[] vert;
+        public Float[] col;
 
-        public TriangleData(Triangle vert, Pentatope col){
+        public TriangleData(Float[] vert, Float[] col){
             this.vert = vert;
-            this.col = col.toFloatArray();
+            this.col = col;
         }
     }
 }
