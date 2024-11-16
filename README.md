@@ -1,6 +1,6 @@
 # ZephyroGame
 
-A simple text-based strategy game made by [Zephyros1938](https://github.com/Zephyros1938)
+A simple strategy game made by [Zephyros1938](https://github.com/Zephyros1938)
 
 ## $\color{#f00}{\textsf{ZephyroGame IS CURRENTLY UNDERGOING A LARGE REWORK}}$
 
@@ -12,15 +12,9 @@ This game is a work in progress, as Zephyros1938 is actively learning Java; Expe
 
 ### Recompilation
 
-You can run the game by executing either of the Recompilation Scripts:
-- [Linux/Mac](/recompile.sh)
-- [Windows](/recompile.bat)
+We suggest you use Maven for recompiling this project.
 
-### Use
-
-controls are WASD or arrow keys.
-
-Avoid the enemies and collect orbs.
+Visual Studio Code is another good way of running this project, we reccommend that IDE if you plan to develop.
 
 ## LICENSE & LEGAL
 
