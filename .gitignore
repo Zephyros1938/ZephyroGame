@@ -2,7 +2,4 @@
 
 __test.*
 
-/build
-/build/*
-/sources
-/sources/*
+sources.txt
