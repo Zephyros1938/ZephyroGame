@@ -13,7 +13,7 @@ public class PerlinNoise {
     private static final int GRADIENT_SIZE = 256;
     private final int[] perm = new int[512];
 
-    private long S = 1; // seed
+    private long S = 1; // Seed for noise generation
 
     private static final float[][] grad2 = {
             { 1, 1 }, { -1, 1 }, { 1, -1 }, { -1, -1 },
@@ -44,30 +44,29 @@ public class PerlinNoise {
         S = changeTo;
     }
 
-    private static Integer X,Y,aa,ab,ba,bb = 0;
-    private static Float xCoord, yCoord, u, v, gradAA, gradBA, gradAB, gradBB, lerpX1, lerpX2, lerpedValue;
+    private static int X,Y,aa,ab,ba,bb = 0;
+    private static float xCoord, yCoord, u, v, gradAA, gradBA, gradAB, gradBB, lerpX1, lerpX2, lerpedValue;
 
     public float noise(float x, float y) {
-        X = (int) Math.floor(x) & 255; // GET UNIT SQUARE CONTAINING POINT
+        X = (int) Math.floor(x) & 255; // Get the unit square containing the point
         Y = (int) Math.floor(y) & 255;
-        //System.out.println("X&Y : " + X + " " + Y);
 
-        xCoord = (float) Math.floor(x); // RELATIVE XY COORDS WITHIN THE SQUARE
+        xCoord = (float) Math.floor(x); // Get xy relative coordinates
         yCoord = (float) Math.floor(y);
 
-        x -= xCoord; // RELATIVE XY COORDS WITHIN THE SQUARE
+        x -= xCoord; // Make xy coordinates relative
         y -= yCoord;
 
         u = Util.fade(x);
         v = Util.fade(y);
 
-        // HASH 4 CORNERS
+        // Hash all 4 corners
         aa = perm[X + perm[Y]] & 3;
         ab = perm[X + perm[Y + 1]] & 3;
         ba = perm[X + 1 + perm[Y]] & 3;
         bb = perm[X + 1 + perm[Y + 1]] & 3;
 
-        // ADD BLEND RESULTS FROM 4 CORNERS OF SQUARE
+        // Add blend results from four corners of square
         gradAA = Util.dot(grad2[aa], x, y);
         gradBA = Util.dot(grad2[ba], x - 1, y);
         gradAB = Util.dot(grad2[ab], x, y - 1);
@@ -77,19 +76,6 @@ public class PerlinNoise {
         lerpX2 = Util.lerp(u, gradAB, gradBB);
 
         lerpedValue = Util.lerp(v, lerpX1, lerpX2);
-
-        /* // DEBUG
-         * System.out.println(
-         * "X: " + X + ", Y: " + Y +
-         * "\nxCoord: " + xCoord + ", yCoord: " + yCoord +
-         * "\nu: " + u + ", v: " + v +
-         * "\naa: " + aa + ", ab: " + ab + ", ba: " + ba + ", bb: " + bb +
-         * "\ngradAA: " + gradAA + ", gradBA: " + gradBA + ", gradAB: " + gradAB +
-         * ", gradBB: " + gradBB +
-         * "\nlerpX1: " + lerpX1 + ", lerpX2: " + lerpX2 +
-         * "\nResult: " + lerpedValue + "\n");
-         */
-        //System.out.println(lerpedValue);
 
         return lerpedValue;
     }

@@ -6,11 +6,13 @@ public class TimeStamp {
     private String Task;
 
     public void Start(String tsk) {
-        Time = System.currentTimeMillis();
-        Task = tsk;
+        this.Time = System.currentTimeMillis();
+        this.Task = tsk;
     }
 
     public void End() {
         System.out.println("Completed " + Task + " In " + (System.currentTimeMillis() - Time) + "ms");
+        Time = 0;
+        Task = new String();
     }
 }

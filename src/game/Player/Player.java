@@ -2,11 +2,11 @@ package game.Player;
 
 public class Player { // TODO : Add player class for user interaction with game.Display
 
-    private Integer PLAYER_ID;
+    private long PID;
     private String PLAYER_NAME;
     
-    public Player(int PID, String NAME) {
-        this.PLAYER_ID = PID;
+    public Player(long PLAYER_ID, String NAME) {
+        this.PID = PLAYER_ID;
         this.PLAYER_NAME = NAME;
     }
 }

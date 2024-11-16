@@ -4,8 +4,8 @@ public class Vector {
 
     public static class Vector2 {
 
-        public Float x;
-        public Float y;
+        public float x;
+        public float y;
 
         /* CONSTRUCTORS */
 
@@ -73,13 +73,13 @@ public class Vector {
     }
 
     public static class Vector3 {
-        public Float x;
-        public Float y;
-        public Float z;
+        public float x;
+        public float y;
+        public float z;
 
         /* CONSTRUCTORS */
 
-        public Vector3(Float x, Float y, Float z) {
+        public Vector3(float x, float y, float z) {
             this.x = x;
             this.y = y;
             this.z = z;
@@ -120,7 +120,7 @@ public class Vector {
         }
 
         public Vector3 normalize() {
-            Float mag = magnitude();
+            float mag = magnitude();
             if (mag == 0) {
                 return new Vector3(0.0f, 0.0f, 0.0f);
             }
@@ -134,14 +134,14 @@ public class Vector {
     }
 
     public static class Vector4 {
-        public Float x;
-        public Float y;
-        public Float z;
-        public Float w;
+        public float x;
+        public float y;
+        public float z;
+        public float w;
 
         /* CONSTRUCTORS */
 
-        public Vector4(Float x, Float y, Float z, Float w) {
+        public Vector4(float x, float y, float z, float w) {
             this.x = x;
             this.y = y;
             this.z = z;
@@ -183,7 +183,7 @@ public class Vector {
         }
 
         public Vector4 normalize() {
-            Float mag = magnitude();
+            float mag = magnitude();
             if (mag == 0) {
                 return new Vector4(0.0f, 0.0f, 0.0f, 0.0f);
             }
