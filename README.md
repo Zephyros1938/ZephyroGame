@@ -2,6 +2,10 @@
 
 A simple text-based strategy game made by [Zephyros1938](https://github.com/Zephyros1938)
 
+## $\color{#f00}{\textsf{ZephyroGame IS CURRENTLY UNDERGOING A LARGE REWORK}}$
+
+Commits are ONLY going to be made to the [Rework-1.0](https://github.com/Zephyros1938/ZephyroGame/tree/Rework-1.0) branch as of now (11/15/2024).
+
 ## About
 
 This game is a work in progress, as Zephyros1938 is actively learning Java; Expect changes.
