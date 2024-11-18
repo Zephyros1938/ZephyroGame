@@ -3,22 +3,22 @@ package game.Display;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-
 import java.nio.FloatBuffer;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFW;
-
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
+import lib.math.Util.Util;
+
 public class Display {
     private static boolean DEBUG = false;
 
-    private static long window;
+    private static Window window;
     static private int SCREEN_WIDTH;
     static private int SCREEN_HEIGHT;
 
@@ -106,40 +106,20 @@ public class Display {
 
     public void Initialize() throws IOException {
 
-        // Check if the window can and has been created
-        if (!GLFW.glfwInit())
-            throw new IllegalStateException("Unable to initialize GLFW");
-        window = GLFW.glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Window", 0, 0);
-        if (window == 0)
-            throw new RuntimeException("Failed to create the GLFW window.");
+        window = new Window(SCREEN_WIDTH, SCREEN_HEIGHT, "Window", 0, 0);
+        window.Init();
 
-        GLFW.glfwMakeContextCurrent(window);
-        GL.createCapabilities();
-        GLFW.glfwShowWindow(window);
-        GLFW.glfwSwapInterval(1);
+        Shader shader1 = new Shader(SHADER_ATTRIBUTE_LEN);
 
-        // Initialize shaders
-        int shaderProgram = createShaderProgram();
-        GL20.glUseProgram(shaderProgram);
-
-        // Generate the VAO & VBO
-        int vao = GL30.glGenVertexArrays();
-        int vbo = GL15.glGenBuffers();
-        GL30.glBindVertexArray(vao);
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
-
-        // Insert data into the VBO (Vertex Buffer Object) (Specifically the triangle
-        // vertexes)
-        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, vertexBuffer, GL15.GL_STATIC_DRAW);
+        shader1.Init(vertexBuffer);
 
         // Triangle vertex positions
-        GL20.glVertexAttribPointer(0, 2, GL11.GL_FLOAT, false, SHADER_ATTRIBUTE_LEN * Float.BYTES, 0);
-        GL20.glEnableVertexAttribArray(0);
-
+        System.out.println("Adding Shader Coord Len");
+        shader1.AddVertexAttrib(SHADER_COORD_LEN);
+        
         // Triangle side values
-        GL20.glVertexAttribPointer(1, SHADER_SIDE_LEN, GL11.GL_FLOAT, false, SHADER_ATTRIBUTE_LEN * Float.BYTES,
-                2 * Float.BYTES);
-        GL20.glEnableVertexAttribArray(1);
+        System.out.println("Adding Shader Side Len");
+        shader1.AddVertexAttrib(SHADER_SIDE_LEN);        
 
         if (DEBUG) {
             for (int i = 0; i < vertexBuffer.limit(); i += SHADER_ATTRIBUTE_LEN) {
@@ -149,26 +129,28 @@ public class Display {
         }
 
         // * Start the render loop
-        while (!GLFW.glfwWindowShouldClose(window)) {
+        while (!GLFW.glfwWindowShouldClose(window.WINDOW)) {
             GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 
             // Draw triangles
-            GL30.glBindVertexArray(vao);
+            GL30.glBindVertexArray(shader1.VAO);
             GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, vertices.length / SHADER_ATTRIBUTE_LEN);
 
-            GLFW.glfwSwapBuffers(window);
+            GLFW.glfwSwapBuffers(window.WINDOW);
             GLFW.glfwPollEvents();
         }
 
         // Cleanup the shaders & buffers on kill
-        GL20.glDeleteProgram(shaderProgram);
-        GL15.glDeleteBuffers(vbo);
-        GL30.glDeleteVertexArrays(vao);
-        GLFW.glfwDestroyWindow(window);
+        GL20.glDeleteProgram(shader1.SHADER_PROGRAM);
+        GL15.glDeleteBuffers(shader1.VBO);
+        GL30.glDeleteVertexArrays(shader1.VAO);
+        GLFW.glfwDestroyWindow(window.WINDOW);
         GLFW.glfwTerminate();
     }
+}
 
-    public int loadShader(String filepath, int type) throws IOException {
+class ShaderUtils {
+    public static int loadShader(String filepath, int type) throws IOException {
         StringBuilder shaderSource = new StringBuilder();
         try (BufferedReader reader = new BufferedReader(new FileReader(filepath))) {
             String line;
@@ -185,7 +167,7 @@ public class Display {
         return shaderID;
     }
 
-    public int createShaderProgram() throws IOException {
+    public static int createShaderProgram() throws IOException {
         int vertexShader = loadShader("src/game/Display/Shaders/default_vert.glsl", GL20.GL_VERTEX_SHADER);
         int fragmentShader = loadShader("src/game/Display/Shaders/default_frag.glsl", GL20.GL_FRAGMENT_SHADER);
         int shaderProgram = GL20.glCreateProgram();
@@ -198,5 +180,90 @@ public class Display {
         GL20.glDeleteShader(vertexShader);
         GL20.glDeleteShader(fragmentShader);
         return shaderProgram;
+    }
+}
+
+class Window {
+    private int SCREEN_HEIGHT = 720;
+    private int SCREEN_WIDTH = 720;
+    private CharSequence TITLE = "Default Window Title";
+    private long MONITOR = 0;
+    private long SHARE = 0;
+
+    public long WINDOW;
+
+    public Window(int SCREEN_WIDTH, int SCREEN_HEIGHT) {
+        this.SCREEN_WIDTH = SCREEN_WIDTH;
+        this.SCREEN_HEIGHT = SCREEN_HEIGHT;
+    }
+
+    public Window(int SCREEN_WIDTH, int SCREEN_HEIGHT, CharSequence TITLE) {
+        this.SCREEN_WIDTH = SCREEN_WIDTH;
+        this.SCREEN_HEIGHT = SCREEN_HEIGHT;
+        this.TITLE = TITLE;
+    }
+
+    public Window(int SCREEN_WIDTH, int SCREEN_HEIGHT, CharSequence TITLE, long MONITOR, long SHARE) {
+        this.SCREEN_WIDTH = SCREEN_WIDTH;
+        this.SCREEN_HEIGHT = SCREEN_HEIGHT;
+        this.TITLE = TITLE;
+        this.MONITOR = MONITOR;
+        this.SHARE = SHARE;
+    }
+
+    public void Init() {
+        if (!GLFW.glfwInit())
+            throw new IllegalStateException("Unable to initialize GLFW");
+        WINDOW = GLFW.glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, TITLE, MONITOR, SHARE);
+        if (WINDOW == 0)
+            throw new RuntimeException("Failed to create the GLFW window.");
+
+        GLFW.glfwMakeContextCurrent(WINDOW);
+        GL.createCapabilities();
+    }
+}
+
+class Shader {
+    public int VAO;
+    public int VBO;
+    public int SHADER_PROGRAM;
+
+    private int SHADER_ATTRIBUTE_LEN;
+
+    private int SHADER_CURRENT_INDEX = 0;
+    private int SHADER_CURRENT_SIZE = 0;
+
+    public Shader(int SHADER_ATTRIBUTE_LEN) throws IOException {
+        this.SHADER_ATTRIBUTE_LEN = SHADER_ATTRIBUTE_LEN;
+        this.SHADER_PROGRAM = ShaderUtils.createShaderProgram();
+        GL20.glUseProgram(SHADER_PROGRAM);
+    }
+
+    public void Init(FloatBuffer VertexData) {
+        Init_VAO();
+        Init_VBO();
+        GL30.glBindVertexArray(VAO);
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, VBO);
+        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, VertexData, GL15.GL_STATIC_DRAW);
+    }
+
+    public void AddVertexAttrib(int SIZE) {
+        System.out.println("Adding shader at " + SHADER_CURRENT_INDEX + " with size of " + SIZE + " with shader total size of " + SHADER_CURRENT_SIZE);
+        GL20.glVertexAttribPointer(SHADER_CURRENT_INDEX,
+                SIZE,
+                GL11.GL_FLOAT, false,
+                SHADER_ATTRIBUTE_LEN * Float.BYTES,
+                SHADER_CURRENT_SIZE * Float.BYTES);
+        GL20.glEnableVertexAttribArray(SHADER_CURRENT_INDEX);
+        SHADER_CURRENT_INDEX += 1;
+        SHADER_CURRENT_SIZE += SIZE;
+    }
+
+    private void Init_VAO() {
+        this.VAO = GL30.glGenVertexArrays();
+    }
+
+    private void Init_VBO() {
+        this.VBO = GL15.glGenBuffers();
     }
 }
