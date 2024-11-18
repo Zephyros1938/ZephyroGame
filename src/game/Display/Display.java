@@ -12,6 +12,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
+import org.lwjgl.opengl.GLUtil;
 
 public class Display {
     private static boolean DEBUG = false;
@@ -45,9 +46,9 @@ public class Display {
         // y = y * 2f / Ydim - 1f;
 
         // vert = new float[] {
-        //         x, y, // Bottom left
-        //         x, y + incrY * 2, // Top left
-        //         x + incrX * 2, y + incrY * 2 // Top right
+        // x, y, // Bottom left
+        // x, y + incrY * 2, // Top left
+        // x + incrX * 2, y + incrY * 2 // Top right
         // };
 
         float[] side = new float[] { 0f, 1f, 2f };
@@ -101,14 +102,13 @@ public class Display {
         window = new Window(SCREEN_WIDTH, SCREEN_HEIGHT, "Window", 0, 0);
         window.Init();
 
-        Shader shader1 = new Shader(SHADER_ATTRIBUTE_LEN);
-        shader1.Init(vertexBuffer);
-        shader1.AddVertexAttrib(SHADER_COORD_LEN); // Triangle vertex positions
-        shader1.AddVertexAttrib(SHADER_SIDE_LEN); // Triangle side values
-        shader1.AddUniformAttrib(2f / Xdim - 1f, "xMod");
-        shader1.AddUniformAttrib(2f / Ydim - 1f, "yMod");
-
-        window.addShader(shader1);
+        Shader defaultShader = new Shader(SHADER_ATTRIBUTE_LEN);
+        defaultShader.Init(vertexBuffer);
+        defaultShader.AddVertexAttrib(SHADER_COORD_LEN); // Triangle vertex positions
+        defaultShader.AddVertexAttrib(SHADER_SIDE_LEN); // Triangle side values
+        defaultShader.AddUniformAttrib1f(2f / Xdim - 1f, "xMod");
+        defaultShader.AddUniformAttrib1f(2f / Ydim - 1f, "yMod");
+        window.addShader(defaultShader);
 
         if (DEBUG) {
             for (int i = 0; i < vertexBuffer.limit(); i += SHADER_ATTRIBUTE_LEN) {
@@ -118,12 +118,22 @@ public class Display {
         }
 
         // * Start the render loop
+        double PREVIOUS_TIME = GLFW.glfwGetTime();
+        double CURRENT_TIME;
+        double NB_FRAMES = 0;
         while (!GLFW.glfwWindowShouldClose(window.WINDOW)) {
+            CURRENT_TIME = GLFW.glfwGetTime();
+            NB_FRAMES++;
+            if (CURRENT_TIME - PREVIOUS_TIME >= 1.0) {
+                // System.err.println("Current FPS: " + NB_FRAMES);
+                NB_FRAMES = 0;
+                PREVIOUS_TIME += 1;
+            }
             GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 
-            // Draw triangles
-            GL30.glBindVertexArray(shader1.VAO);
+            GL30.glBindVertexArray(defaultShader.VAO);
             GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, VERTICE_LENGTH / SHADER_ATTRIBUTE_LEN);
+            GL30.glBindVertexArray(0);
 
             GLFW.glfwSwapBuffers(window.WINDOW);
             GLFW.glfwPollEvents();
@@ -253,16 +263,31 @@ class Shader {
     public void AddVertexAttrib(int SIZE) {
         GL20.glVertexAttribPointer(SHADER_CURRENT_INDEX,
                 SIZE,
-                GL11.GL_FLOAT, false,
+                GL11.GL_FLOAT, true,
                 SHADER_ATTRIBUTE_LEN * Float.BYTES,
                 SHADER_CURRENT_SIZE * Float.BYTES);
         GL20.glEnableVertexAttribArray(SHADER_CURRENT_INDEX++);
         SHADER_CURRENT_SIZE += SIZE;
     }
 
-    public void AddUniformAttrib(float VALUE, CharSequence NAME) {
+    public void AddUniformAttrib1f(float V0, CharSequence NAME) {
         int uniformLocation = GL20.glGetUniformLocation(SHADER_PROGRAM, NAME);
-        GL20.glUniform1f(uniformLocation, VALUE);
+        GL20.glUniform1f(uniformLocation, V0);
+    }
+
+    public void AddUniformAttrib2f(float V0, float V1, CharSequence NAME) {
+        int uniformLocation = GL20.glGetUniformLocation(SHADER_PROGRAM, NAME);
+        GL20.glUniform2f(uniformLocation, V0, V1);
+    }
+
+    public void AddUniformAttrib3f(float V0, float V1, float V2, CharSequence NAME) {
+        int uniformLocation = GL20.glGetUniformLocation(SHADER_PROGRAM, NAME);
+        GL20.glUniform3f(uniformLocation, V0, V1, V2);
+    }
+
+    public void AddUniformAttrib4f(float V0, float V1, float V2, float V3, CharSequence NAME) {
+        int uniformLocation = GL20.glGetUniformLocation(SHADER_PROGRAM, NAME);
+        GL20.glUniform4f(uniformLocation, V0, V1, V2, V3);
     }
 
     private void Init_VAO() {
