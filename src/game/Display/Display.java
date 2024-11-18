@@ -34,8 +34,10 @@ public class Display {
     static final int SHADER_ATTRIBUTE_LEN = SHADER_COORD_LEN + SHADER_SIDE_LEN;
     static final int SHADER_TOTAL_LEN = SHADER_ATTRIBUTE_LEN * SHADER_VERT_COUNT;
 
-    static private float[] vertices = new float[(int) (Xdim * Ydim) * SHADER_TOTAL_LEN];
-    static final private FloatBuffer vertexBuffer = BufferUtils.createFloatBuffer(vertices.length);
+    static double FRAMES_PER_SECOND = 1.0d / 60.0d;
+
+    static private float[] vertices = new float[(int) ((Xdim * Ydim) * SHADER_TOTAL_LEN) * 2];
+    static final private FloatBuffer vertexBuffer = BufferUtils.createFloatBuffer(vertices.length * 2);
 
     static int index = 0;
 
@@ -45,7 +47,9 @@ public class Display {
         x = x * 2f / Xdim - 1f;
         y = y * 2f / Ydim - 1f;
 
-        float[] vert = {
+        float[] vert = new float[6];
+
+        vert = new float[] {
                 x, y, // Bottom left
                 x, y + incrY * 2, // Top left
                 x + incrX * 2, y + incrY * 2 // Top right
@@ -53,6 +57,11 @@ public class Display {
 
         float[] side = new float[] { 0f, 1f, 2f };
         if (ID % 2 == 1) {
+            vert = new float[] {
+                    x, y, // Bottom left
+                    x + incrX * 2, y, // Top left
+                    x + incrX * 2, y + incrY * 2 // Top right
+            };
             side = new float[] { 3f, 4f, 5f };
         }
 
@@ -71,7 +80,12 @@ public class Display {
         for (Integer bit = 0; bit < Screen; bit++) {
             float XU = bit % (Xdim);
             float YU = (float) Math.floor((bit) / Xdim);
-            DrawTriangle(XU, YU, bit);
+            DrawTriangle(XU, YU, 0);
+        }
+        for (Integer bit = 0; bit < Screen; bit++) {
+            float XU = bit % (Xdim);
+            float YU = (float) Math.floor((bit) / Xdim);
+            DrawTriangle(XU, YU, 1);
         }
 
         vertexBuffer.put(vertices).flip();
@@ -93,9 +107,11 @@ public class Display {
     public void Initialize() throws IOException {
 
         // Check if the window can and has been created
-        if (!GLFW.glfwInit()) throw new IllegalStateException("Unable to initialize GLFW");
+        if (!GLFW.glfwInit())
+            throw new IllegalStateException("Unable to initialize GLFW");
         window = GLFW.glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Window", 0, 0);
-        if (window == 0) throw new RuntimeException("Failed to create the GLFW window.");
+        if (window == 0)
+            throw new RuntimeException("Failed to create the GLFW window.");
 
         GLFW.glfwMakeContextCurrent(window);
         GL.createCapabilities();
@@ -112,7 +128,8 @@ public class Display {
         GL30.glBindVertexArray(vao);
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
 
-        // Insert data into the VBO (Vertex Buffer Object) (Specifically the triangle vertexes)
+        // Insert data into the VBO (Vertex Buffer Object) (Specifically the triangle
+        // vertexes)
         GL15.glBufferData(GL15.GL_ARRAY_BUFFER, vertexBuffer, GL15.GL_STATIC_DRAW);
 
         // Triangle vertex positions
@@ -133,7 +150,7 @@ public class Display {
 
         // * Start the render loop
         while (!GLFW.glfwWindowShouldClose(window)) {
-            GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
+            GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 
             // Draw triangles
             GL30.glBindVertexArray(vao);
