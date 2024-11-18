@@ -20,9 +20,9 @@ public class Display {
     static private int SCREEN_WIDTH;
     static private int SCREEN_HEIGHT;
 
-    static private final float Xdim = 4f, Ydim = 4f;
+    static private final int Xdim = 4, Ydim = 4;
 
-    static public int Screen = (int) (Xdim * Ydim);
+    static public int Screen = Xdim * Ydim;
 
     static final float incrX = (1f / Xdim), incrY = (1f / Ydim);
 
@@ -32,9 +32,8 @@ public class Display {
     static final int SHADER_ATTRIBUTE_LEN = SHADER_COORD_LEN + SHADER_SIDE_LEN;
     static final int SHADER_TOTAL_LEN = SHADER_ATTRIBUTE_LEN * SHADER_VERT_COUNT;
 
-    static double FRAMES_PER_SECOND = 1.0d / 60.0d;
-
-    static private float[] vertices = new float[(int) ((Xdim * Ydim) * SHADER_TOTAL_LEN) * 2];
+    static private final int VERTICE_LENGTH = Xdim * Ydim * SHADER_TOTAL_LEN * 2;
+    static private float[] vertices = new float[VERTICE_LENGTH];
     static final private FloatBuffer vertexBuffer = BufferUtils.createFloatBuffer(vertices.length * 2);
 
     static int index = 0;
@@ -42,30 +41,23 @@ public class Display {
     static void DrawTriangle(float x, float y, int ID) {
 
         // Transform to NDC coordinates
-        x = x * 2f / Xdim - 1f;
-        y = y * 2f / Ydim - 1f;
+        // x = x * 2f / Xdim - 1f;
+        // y = y * 2f / Ydim - 1f;
 
-        float[] vert = new float[6];
-
-        vert = new float[] {
-                x, y, // Bottom left
-                x, y + incrY * 2, // Top left
-                x + incrX * 2, y + incrY * 2 // Top right
-        };
+        // vert = new float[] {
+        //         x, y, // Bottom left
+        //         x, y + incrY * 2, // Top left
+        //         x + incrX * 2, y + incrY * 2 // Top right
+        // };
 
         float[] side = new float[] { 0f, 1f, 2f };
         if (ID % 2 == 1) {
-            vert = new float[] {
-                    x, y, // Bottom left
-                    x + incrX * 2, y, // Top left
-                    x + incrX * 2, y + incrY * 2 // Top right
-            };
             side = new float[] { 3f, 4f, 5f };
         }
 
         for (int i = 0; i < SHADER_VERT_COUNT; i++) {
-            vertices[index++] = vert[i * 2]; // X
-            vertices[index++] = vert[i * 2 + 1]; // Y
+            vertices[index++] = x; // X
+            vertices[index++] = y; // Y
             vertices[index++] = side[i]; // Side (color flag; check frag & vert glsl files)
         }
     }
@@ -90,7 +82,7 @@ public class Display {
 
         if (this.DEBUG) {
             System.out.println("Display Created");
-            for (int i = 0; i < vertices.length / SHADER_TOTAL_LEN; i++) {
+            for (int i = 0; i < VERTICE_LENGTH / SHADER_TOTAL_LEN; i++) {
                 int base = i * SHADER_ATTRIBUTE_LEN;
                 System.out.printf("Triangle %d:\n", i);
                 for (int v = 0; v < SHADER_VERT_COUNT; v++) {
@@ -100,6 +92,8 @@ public class Display {
                 }
             }
         }
+
+        vertices = new float[0];
     }
 
     public void Initialize() throws IOException {
@@ -108,14 +102,11 @@ public class Display {
         window.Init();
 
         Shader shader1 = new Shader(SHADER_ATTRIBUTE_LEN);
-
         shader1.Init(vertexBuffer);
-
-        // Triangle vertex positions
-        shader1.AddVertexAttrib(SHADER_COORD_LEN);
-
-        // Triangle side values
-        shader1.AddVertexAttrib(SHADER_SIDE_LEN);
+        shader1.AddVertexAttrib(SHADER_COORD_LEN); // Triangle vertex positions
+        shader1.AddVertexAttrib(SHADER_SIDE_LEN); // Triangle side values
+        shader1.AddUniformAttrib(2f / Xdim - 1f, "xMod");
+        shader1.AddUniformAttrib(2f / Ydim - 1f, "yMod");
 
         window.addShader(shader1);
 
@@ -132,7 +123,7 @@ public class Display {
 
             // Draw triangles
             GL30.glBindVertexArray(shader1.VAO);
-            GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, vertices.length / SHADER_ATTRIBUTE_LEN);
+            GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, VERTICE_LENGTH / SHADER_ATTRIBUTE_LEN);
 
             GLFW.glfwSwapBuffers(window.WINDOW);
             GLFW.glfwPollEvents();
@@ -267,6 +258,11 @@ class Shader {
                 SHADER_CURRENT_SIZE * Float.BYTES);
         GL20.glEnableVertexAttribArray(SHADER_CURRENT_INDEX++);
         SHADER_CURRENT_SIZE += SIZE;
+    }
+
+    public void AddUniformAttrib(float VALUE, CharSequence NAME) {
+        int uniformLocation = GL20.glGetUniformLocation(SHADER_PROGRAM, NAME);
+        GL20.glUniform1f(uniformLocation, VALUE);
     }
 
     private void Init_VAO() {
