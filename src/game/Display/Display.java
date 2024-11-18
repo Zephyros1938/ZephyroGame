@@ -112,11 +112,9 @@ public class Display {
         shader1.Init(vertexBuffer);
 
         // Triangle vertex positions
-        System.out.println("Adding Shader Coord Len");
         shader1.AddVertexAttrib(SHADER_COORD_LEN);
 
         // Triangle side values
-        System.out.println("Adding Shader Side Len");
         shader1.AddVertexAttrib(SHADER_SIDE_LEN);        
 
         if (DEBUG) {
@@ -246,7 +244,6 @@ class Shader {
     }
 
     public void AddVertexAttrib(int SIZE) {
-        System.out.println("Adding shader at " + SHADER_CURRENT_INDEX + " with size of " + SIZE + " with shader total size of " + SHADER_CURRENT_SIZE);
         GL20.glVertexAttribPointer(SHADER_CURRENT_INDEX,
                 SIZE,
                 GL11.GL_FLOAT, false,
