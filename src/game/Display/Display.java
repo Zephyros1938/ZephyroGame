@@ -97,12 +97,15 @@ public class Display {
         vertices = new float[0];
     }
 
+    Shader defaultShader;
+
     public void Initialize() throws IOException {
 
         window = new Window(SCREEN_WIDTH, SCREEN_HEIGHT, "Window", 0, 0);
         window.Init();
 
-        Shader defaultShader = new Shader(SHADER_ATTRIBUTE_LEN);
+        defaultShader = new Shader(SHADER_ATTRIBUTE_LEN);
+        
         defaultShader.Init(vertexBuffer);
         defaultShader.AddVertexAttrib(SHADER_COORD_LEN); // Triangle vertex positions
         defaultShader.AddVertexAttrib(SHADER_SIDE_LEN); // Triangle side values
@@ -116,22 +119,24 @@ public class Display {
                         vertexBuffer.get(i), vertexBuffer.get(i + 1), vertexBuffer.get(i + 2));
             }
         }
+    }
 
+    public void GameLoop() {
         Timer timer = new Timer();
 
         float delta;
         float accumulator = 0f;
-        float interval = 1f/60;
+        float interval = 1f / 60;
 
-        // * Start the render loop
-        timer.Init(); // May be useful for gameloop: https://github.com/SilverTiger/lwjgl3-tutorial/wiki/Timing
+        timer.Init(); // May be useful for gameloop:
+                      // https://github.com/SilverTiger/lwjgl3-tutorial/wiki/Timing
         while (!GLFW.glfwWindowShouldClose(window.WINDOW)) {
             delta = timer.getDelta();
             accumulator += delta;
 
-            while(accumulator>=interval){
+            while (accumulator >= interval) {
                 GLFW.glfwPollEvents();
-                accumulator-=interval;
+                accumulator -= interval;
             }
 
             // RENDER
@@ -140,12 +145,19 @@ public class Display {
             GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, VERTICE_LENGTH / SHADER_ATTRIBUTE_LEN);
             GL30.glBindVertexArray(0);
 
-            //UPDATE
+            // UPDATE
             GLFW.glfwSwapBuffers(window.WINDOW);
         }
+    }
 
-        // Cleanup the shaders & buffers on kill
+    public void Dispose() { // Cleanup the shaders & buffers on kill
         window.Terminate();
+    }
+
+    public void Run() throws IOException{
+        Initialize();
+        GameLoop();
+        Dispose();
     }
 }
 
@@ -223,7 +235,7 @@ class Timer {
             timeCount -= 1f;
         }
     }
-    
+
     public int getUPS() {
         return ups > 0 ? ups : upsCount;
     }

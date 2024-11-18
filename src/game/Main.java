@@ -6,6 +6,6 @@ public class Main {
     private static Display display = new Display(720, 720, false);
 
     public static void main(String[] args) throws Exception {
-        display.Initialize();
+        display.Run();
     }
 }
