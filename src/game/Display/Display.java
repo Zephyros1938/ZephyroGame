@@ -117,26 +117,31 @@ public class Display {
             }
         }
 
-        // * Start the render loop
-        double PREVIOUS_TIME = GLFW.glfwGetTime();
-        double CURRENT_TIME;
-        double NB_FRAMES = 0;
-        while (!GLFW.glfwWindowShouldClose(window.WINDOW)) {
-            CURRENT_TIME = GLFW.glfwGetTime();
-            NB_FRAMES++;
-            if (CURRENT_TIME - PREVIOUS_TIME >= 1.0) {
-                // System.err.println("Current FPS: " + NB_FRAMES);
-                NB_FRAMES = 0;
-                PREVIOUS_TIME += 1;
-            }
-            GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
+        Timer timer = new Timer();
 
+        float delta;
+        float accumulator = 0f;
+        float interval = 1f/60;
+
+        // * Start the render loop
+        timer.Init(); // May be useful for gameloop: https://github.com/SilverTiger/lwjgl3-tutorial/wiki/Timing
+        while (!GLFW.glfwWindowShouldClose(window.WINDOW)) {
+            delta = timer.getDelta();
+            accumulator += delta;
+
+            while(accumulator>=interval){
+                GLFW.glfwPollEvents();
+                accumulator-=interval;
+            }
+
+            // RENDER
+            GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
             GL30.glBindVertexArray(defaultShader.VAO);
             GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, VERTICE_LENGTH / SHADER_ATTRIBUTE_LEN);
             GL30.glBindVertexArray(0);
 
+            //UPDATE
             GLFW.glfwSwapBuffers(window.WINDOW);
-            GLFW.glfwPollEvents();
         }
 
         // Cleanup the shaders & buffers on kill
@@ -175,6 +180,60 @@ class ShaderUtils {
         GL20.glDeleteShader(vertexShader);
         GL20.glDeleteShader(fragmentShader);
         return shaderProgram;
+    }
+}
+
+class Timer {
+    private double lastLoopTime;
+    private float timeCount;
+    private int fpsCount, upsCount, fps, ups;
+
+    private double getTime() {
+        return System.nanoTime() / 1000000000.0;
+    }
+
+    public void Init() {
+        lastLoopTime = getTime();
+    }
+
+    public float getDelta() {
+        double time = getTime();
+        float delta = (float) (time - lastLoopTime);
+        lastLoopTime = time;
+        timeCount += delta;
+        return delta;
+    }
+
+    public void updateFPS() {
+        fpsCount++;
+    }
+
+    public void updateUPS() {
+        upsCount++;
+    }
+
+    public void update() {
+        if (timeCount > 1f) {
+            fps = fpsCount;
+            fpsCount = 0;
+
+            ups = upsCount;
+            upsCount = 0;
+
+            timeCount -= 1f;
+        }
+    }
+    
+    public int getUPS() {
+        return ups > 0 ? ups : upsCount;
+    }
+
+    public int getFPS() {
+        return fps > 0 ? fps : fpsCount;
+    }
+
+    public double getLastLoopTime() {
+        return lastLoopTime;
     }
 }
 
