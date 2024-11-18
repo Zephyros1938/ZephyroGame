@@ -13,8 +13,6 @@ import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
-import lib.math.Util.Util;
-
 public class Display {
     private static boolean DEBUG = false;
 
@@ -116,7 +114,7 @@ public class Display {
         // Triangle vertex positions
         System.out.println("Adding Shader Coord Len");
         shader1.AddVertexAttrib(SHADER_COORD_LEN);
-        
+
         // Triangle side values
         System.out.println("Adding Shader Side Len");
         shader1.AddVertexAttrib(SHADER_SIDE_LEN);        
