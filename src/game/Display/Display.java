@@ -115,7 +115,9 @@ public class Display {
         shader1.AddVertexAttrib(SHADER_COORD_LEN);
 
         // Triangle side values
-        shader1.AddVertexAttrib(SHADER_SIDE_LEN);        
+        shader1.AddVertexAttrib(SHADER_SIDE_LEN);
+
+        window.addShader(shader1);
 
         if (DEBUG) {
             for (int i = 0; i < vertexBuffer.limit(); i += SHADER_ATTRIBUTE_LEN) {
@@ -137,11 +139,7 @@ public class Display {
         }
 
         // Cleanup the shaders & buffers on kill
-        GL20.glDeleteProgram(shader1.SHADER_PROGRAM);
-        GL15.glDeleteBuffers(shader1.VBO);
-        GL30.glDeleteVertexArrays(shader1.VAO);
-        GLFW.glfwDestroyWindow(window.WINDOW);
-        GLFW.glfwTerminate();
+        window.Terminate();
     }
 }
 
@@ -188,6 +186,8 @@ class Window {
 
     public long WINDOW;
 
+    private Shader[] SHADER_LIST = new Shader[0];
+
     public Window(int SCREEN_WIDTH, int SCREEN_HEIGHT) {
         this.SCREEN_WIDTH = SCREEN_WIDTH;
         this.SCREEN_HEIGHT = SCREEN_HEIGHT;
@@ -216,6 +216,22 @@ class Window {
 
         GLFW.glfwMakeContextCurrent(WINDOW);
         GL.createCapabilities();
+    }
+
+    public void addShader(Shader s) {
+        int SHADER_LIST_LEN = SHADER_LIST.length;
+        SHADER_LIST = new Shader[SHADER_LIST_LEN + 1];
+        SHADER_LIST[SHADER_LIST_LEN] = s;
+    }
+
+    public void Terminate() {
+        for (Shader s : SHADER_LIST) {
+            GL20.glDeleteProgram(s.SHADER_PROGRAM);
+            GL15.glDeleteBuffers(s.VBO);
+            GL30.glDeleteVertexArrays(s.VAO);
+        }
+        GLFW.glfwDestroyWindow(WINDOW);
+        GLFW.glfwTerminate();
     }
 }
 
@@ -249,8 +265,7 @@ class Shader {
                 GL11.GL_FLOAT, false,
                 SHADER_ATTRIBUTE_LEN * Float.BYTES,
                 SHADER_CURRENT_SIZE * Float.BYTES);
-        GL20.glEnableVertexAttribArray(SHADER_CURRENT_INDEX);
-        SHADER_CURRENT_INDEX += 1;
+        GL20.glEnableVertexAttribArray(SHADER_CURRENT_INDEX++);
         SHADER_CURRENT_SIZE += SIZE;
     }
 
