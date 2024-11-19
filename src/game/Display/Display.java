@@ -5,17 +5,18 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.FloatBuffer;
 
-import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFW;
+import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
-import org.lwjgl.opengl.GLUtil;
+import org.lwjgl.system.MemoryUtil;
+
+import org.joml.*;
 
 public class Display {
-    private static boolean DEBUG = false;
 
     private static Window window;
     static private int SCREEN_WIDTH;
@@ -28,73 +29,28 @@ public class Display {
     static final float incrX = (1f / Xdim), incrY = (1f / Ydim);
 
     static final int SHADER_VERT_COUNT = 3;
-    static final int SHADER_COORD_LEN = 2;
-    static final int SHADER_SIDE_LEN = 1;
-    static final int SHADER_ATTRIBUTE_LEN = SHADER_COORD_LEN + SHADER_SIDE_LEN;
+    static final int SHADER_COORD_LEN = 3;
+    static final int SHADER_ATTRIBUTE_LEN = SHADER_COORD_LEN;
     static final int SHADER_TOTAL_LEN = SHADER_ATTRIBUTE_LEN * SHADER_VERT_COUNT;
 
-    static private final int VERTICE_LENGTH = Xdim * Ydim * SHADER_TOTAL_LEN * 2;
-    static private float[] vertices = new float[VERTICE_LENGTH];
-    static final private FloatBuffer vertexBuffer = BufferUtils.createFloatBuffer(vertices.length * 2);
+    static private float[] vertices = new float[27];
 
     static int index = 0;
 
-    static void DrawTriangle(float x, float y, int ID) {
-
-        // Transform to NDC coordinates
-        // x = x * 2f / Xdim - 1f;
-        // y = y * 2f / Ydim - 1f;
-
-        // vert = new float[] {
-        // x, y, // Bottom left
-        // x, y + incrY * 2, // Top left
-        // x + incrX * 2, y + incrY * 2 // Top right
-        // };
-
-        float[] side = new float[] { 0f, 1f, 2f };
-        if (ID % 2 == 1) {
-            side = new float[] { 3f, 4f, 5f };
+    static void DrawTriangle(float x, float y, float z) {
+        if (index + SHADER_TOTAL_LEN > vertices.length) {
+            System.err.println("Vertex buffer overflow at " + index + "!");
+            return;
         }
-
-        for (int i = 0; i < SHADER_VERT_COUNT; i++) {
-            vertices[index++] = x; // X
-            vertices[index++] = y; // Y
-            vertices[index++] = side[i]; // Side (color flag; check frag & vert glsl files)
-        }
+        vertices[index++] = x; // X
+        vertices[index++] = y; // Y
+        vertices[index++] = z;
     }
 
     @SuppressWarnings("static-access")
-    public Display(int SCREEN_X, int SCREEN_Y, boolean DEBUG) {
+    public Display(int SCREEN_X, int SCREEN_Y) {
         this.SCREEN_WIDTH = SCREEN_X;
         this.SCREEN_HEIGHT = SCREEN_Y;
-        this.DEBUG = DEBUG;
-        for (Integer bit = 0; bit < Screen; bit++) {
-            float XU = bit % (Xdim);
-            float YU = (float) Math.floor((bit) / Xdim);
-            DrawTriangle(XU, YU, 0);
-        }
-        for (Integer bit = 0; bit < Screen; bit++) {
-            float XU = bit % (Xdim);
-            float YU = (float) Math.floor((bit) / Xdim);
-            DrawTriangle(XU, YU, 1);
-        }
-
-        vertexBuffer.put(vertices).flip();
-
-        if (this.DEBUG) {
-            System.out.println("Display Created");
-            for (int i = 0; i < VERTICE_LENGTH / SHADER_TOTAL_LEN; i++) {
-                int base = i * SHADER_ATTRIBUTE_LEN;
-                System.out.printf("Triangle %d:\n", i);
-                for (int v = 0; v < SHADER_VERT_COUNT; v++) {
-                    int offset = base + v * SHADER_ATTRIBUTE_LEN;
-                    System.out.printf("\tVertex %d: X=%.2f, Y=%.2f, Side=%.2f\n",
-                            v, vertices[offset], vertices[offset + 1], vertices[offset + 2]);
-                }
-            }
-        }
-
-        vertices = new float[0];
     }
 
     Shader defaultShader;
@@ -105,20 +61,17 @@ public class Display {
         window.Init();
 
         defaultShader = new Shader(SHADER_ATTRIBUTE_LEN);
-        
-        defaultShader.Init(vertexBuffer);
-        defaultShader.AddVertexAttrib(SHADER_COORD_LEN); // Triangle vertex positions
-        defaultShader.AddVertexAttrib(SHADER_SIDE_LEN); // Triangle side values
-        defaultShader.AddUniformAttrib1f(2f / Xdim - 1f, "xMod");
-        defaultShader.AddUniformAttrib1f(2f / Ydim - 1f, "yMod");
-        window.addShader(defaultShader);
 
-        if (DEBUG) {
-            for (int i = 0; i < vertexBuffer.limit(); i += SHADER_ATTRIBUTE_LEN) {
-                System.out.printf("Vertex: X=%.2f, Y=%.2f, Side=%.2f\n",
-                        vertexBuffer.get(i), vertexBuffer.get(i + 1), vertexBuffer.get(i + 2));
-            }
-        }
+        Mesh testMesh = new Mesh( new float[]{
+            -.5f, 0.5f, 0.0f,
+            0.5f, 0.0f, 0.0f,
+            -.5f, -.5f, 0.0f
+        });
+
+        defaultShader.Init(testMesh.getMesh());
+        defaultShader.AddVertexAttrib(SHADER_COORD_LEN); // Triangle vertex positions
+
+        window.addShader(defaultShader);
     }
 
     public void GameLoop() {
@@ -135,29 +88,51 @@ public class Display {
             accumulator += delta;
 
             while (accumulator >= interval) {
-                GLFW.glfwPollEvents();
                 accumulator -= interval;
             }
 
             // RENDER
-            GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
+            GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT | GL11.GL_STENCIL_BUFFER_BIT
+                    | GL11.GL_ACCUM_BUFFER_BIT);
+
             GL30.glBindVertexArray(defaultShader.VAO);
-            GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, VERTICE_LENGTH / SHADER_ATTRIBUTE_LEN);
+            GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, vertices.length);
             GL30.glBindVertexArray(0);
 
             // UPDATE
             GLFW.glfwSwapBuffers(window.WINDOW);
+            GLFW.glfwPollEvents();
         }
+    }
+
+    public void render(Window window) {
+
     }
 
     public void Dispose() { // Cleanup the shaders & buffers on kill
         window.Terminate();
     }
 
-    public void Run() throws IOException{
+    public void Run() throws IOException {
         Initialize();
         GameLoop();
         Dispose();
+    }
+}
+
+class Keyboard extends GLFWKeyCallback {
+    private static boolean[] keys = new boolean[65536];
+
+    @Override
+    public void invoke(long window, int key, int scancode, int action, int mods) {
+        if (key < 0) { // <- ❗️ IMPORTANT: This line is added to prevent `ArrayIndexOutOfBoundsException` in some cases.
+            return;
+        }
+        keys[key] = action != GLFW.GLFW_RELEASE;
+    }
+
+    public static boolean isKeyDown(int keycode) {
+        return keys[keycode];
     }
 }
 
@@ -192,6 +167,135 @@ class ShaderUtils {
         GL20.glDeleteShader(vertexShader);
         GL20.glDeleteShader(fragmentShader);
         return shaderProgram;
+    }
+}
+
+class Window {
+    private int SCREEN_HEIGHT = 720;
+    private int SCREEN_WIDTH = 720;
+    private CharSequence TITLE = "Default Window Title";
+    private long MONITOR = 0;
+    private long SHARE = 0;
+
+    public long WINDOW;
+
+    private Shader[] SHADER_LIST = new Shader[0];
+
+    public Window(int SCREEN_WIDTH, int SCREEN_HEIGHT) {
+        this.SCREEN_WIDTH = SCREEN_WIDTH;
+        this.SCREEN_HEIGHT = SCREEN_HEIGHT;
+    }
+
+    public Window(int SCREEN_WIDTH, int SCREEN_HEIGHT, CharSequence TITLE) {
+        this.SCREEN_WIDTH = SCREEN_WIDTH;
+        this.SCREEN_HEIGHT = SCREEN_HEIGHT;
+        this.TITLE = TITLE;
+    }
+
+    public Window(int SCREEN_WIDTH, int SCREEN_HEIGHT, CharSequence TITLE, long MONITOR, long SHARE) {
+        this.SCREEN_WIDTH = SCREEN_WIDTH;
+        this.SCREEN_HEIGHT = SCREEN_HEIGHT;
+        this.TITLE = TITLE;
+        this.MONITOR = MONITOR;
+        this.SHARE = SHARE;
+    }
+
+    public void Init() {
+        if (!GLFW.glfwInit())
+            throw new IllegalStateException("Unable to initialize GLFW");
+        WINDOW = GLFW.glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, TITLE, MONITOR, SHARE);
+        GLFW.glfwSetKeyCallback(WINDOW, new Keyboard());
+        if (WINDOW == 0)
+            throw new RuntimeException("Failed to create the GLFW window.");
+
+        GLFW.glfwMakeContextCurrent(WINDOW);
+        GL.createCapabilities();
+        GL20.glEnable(GL20.GL_DEPTH_TEST);
+    }
+
+    public void addShader(Shader s) {
+        int SHADER_LIST_LEN = SHADER_LIST.length;
+        SHADER_LIST = new Shader[SHADER_LIST_LEN + 1];
+        SHADER_LIST[SHADER_LIST_LEN] = s;
+    }
+
+    public void Terminate() {
+        for (Shader s : SHADER_LIST) {
+            GL20.glDeleteProgram(s.SHADER_PROGRAM);
+            GL15.glDeleteBuffers(s.VBO);
+            GL30.glDeleteVertexArrays(s.VAO);
+        }
+        GLFW.glfwDestroyWindow(WINDOW);
+        GLFW.glfwTerminate();
+    }
+}
+
+class Shader {
+    public int VAO;
+    public int VBO;
+    public int SHADER_PROGRAM;
+
+    private int SHADER_ATTRIBUTE_LEN;
+
+    private int SHADER_CURRENT_INDEX = 0;
+    private int SHADER_CURRENT_SIZE = 0;
+
+    public Shader(int SHADER_ATTRIBUTE_LEN) throws IOException {
+        this.SHADER_ATTRIBUTE_LEN = SHADER_ATTRIBUTE_LEN;
+        this.SHADER_PROGRAM = ShaderUtils.createShaderProgram();
+        GL20.glUseProgram(SHADER_PROGRAM);
+    }
+
+    public void Init(float[] vertices) {
+        FloatBuffer verticesBuffer = MemoryUtil.memAllocFloat(vertices.length);
+        verticesBuffer.put(vertices).flip();
+
+        Init_VAO();
+        Init_VBO();
+        GL30.glBindVertexArray(VAO);
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, VBO);
+        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, verticesBuffer, GL15.GL_STATIC_DRAW);
+        if (verticesBuffer != null) {
+            MemoryUtil.memFree(verticesBuffer);
+        }
+    }
+
+    public void AddVertexAttrib(int SIZE) {
+        GL20.glVertexAttribPointer(SHADER_CURRENT_INDEX,
+                SIZE,
+                GL11.GL_FLOAT, true,
+                SHADER_ATTRIBUTE_LEN * Float.BYTES,
+                SHADER_CURRENT_SIZE * Float.BYTES);
+        GL20.glEnableVertexAttribArray(SHADER_CURRENT_INDEX++);
+        SHADER_CURRENT_SIZE += SIZE;
+    }
+
+    public void AddUniformAttrib1f(float V0, CharSequence NAME) {
+        int uniformLocation = GL20.glGetUniformLocation(SHADER_PROGRAM, NAME);
+        GL20.glUniform1f(uniformLocation, V0);
+    }
+
+    public void AddUniformAttrib2f(float V0, float V1, CharSequence NAME) {
+        int uniformLocation = GL20.glGetUniformLocation(SHADER_PROGRAM, NAME);
+        GL20.glUniform2f(uniformLocation, V0, V1);
+    }
+
+    public void AddUniformAttrib3f(float V0, float V1, float V2, CharSequence NAME) {
+        int uniformLocation = GL20.glGetUniformLocation(SHADER_PROGRAM, NAME);
+        GL20.glUniform3f(uniformLocation, V0, V1, V2);
+    }
+
+    public void AddUniformAttrib4f(float V0, float V1, float V2, float V3, CharSequence NAME) {
+        int uniformLocation = GL20.glGetUniformLocation(SHADER_PROGRAM, NAME);
+        GL20.glUniform4f(uniformLocation, V0, V1, V2, V3);
+    }
+
+    private void Init_VAO() {
+        this.VAO = GL30.glGenVertexArrays();
+    }
+
+    private void Init_VBO() {
+        this.VBO = GL15.glGenBuffers();
     }
 }
 
@@ -249,123 +353,15 @@ class Timer {
     }
 }
 
-class Window {
-    private int SCREEN_HEIGHT = 720;
-    private int SCREEN_WIDTH = 720;
-    private CharSequence TITLE = "Default Window Title";
-    private long MONITOR = 0;
-    private long SHARE = 0;
+class Mesh {
 
-    public long WINDOW;
+    private float[] POINT_POSITIONS;
 
-    private Shader[] SHADER_LIST = new Shader[0];
-
-    public Window(int SCREEN_WIDTH, int SCREEN_HEIGHT) {
-        this.SCREEN_WIDTH = SCREEN_WIDTH;
-        this.SCREEN_HEIGHT = SCREEN_HEIGHT;
+    public Mesh(float[] pointPositions) {
+        this.POINT_POSITIONS = pointPositions;
     }
 
-    public Window(int SCREEN_WIDTH, int SCREEN_HEIGHT, CharSequence TITLE) {
-        this.SCREEN_WIDTH = SCREEN_WIDTH;
-        this.SCREEN_HEIGHT = SCREEN_HEIGHT;
-        this.TITLE = TITLE;
-    }
-
-    public Window(int SCREEN_WIDTH, int SCREEN_HEIGHT, CharSequence TITLE, long MONITOR, long SHARE) {
-        this.SCREEN_WIDTH = SCREEN_WIDTH;
-        this.SCREEN_HEIGHT = SCREEN_HEIGHT;
-        this.TITLE = TITLE;
-        this.MONITOR = MONITOR;
-        this.SHARE = SHARE;
-    }
-
-    public void Init() {
-        if (!GLFW.glfwInit())
-            throw new IllegalStateException("Unable to initialize GLFW");
-        WINDOW = GLFW.glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, TITLE, MONITOR, SHARE);
-        if (WINDOW == 0)
-            throw new RuntimeException("Failed to create the GLFW window.");
-
-        GLFW.glfwMakeContextCurrent(WINDOW);
-        GL.createCapabilities();
-    }
-
-    public void addShader(Shader s) {
-        int SHADER_LIST_LEN = SHADER_LIST.length;
-        SHADER_LIST = new Shader[SHADER_LIST_LEN + 1];
-        SHADER_LIST[SHADER_LIST_LEN] = s;
-    }
-
-    public void Terminate() {
-        for (Shader s : SHADER_LIST) {
-            GL20.glDeleteProgram(s.SHADER_PROGRAM);
-            GL15.glDeleteBuffers(s.VBO);
-            GL30.glDeleteVertexArrays(s.VAO);
-        }
-        GLFW.glfwDestroyWindow(WINDOW);
-        GLFW.glfwTerminate();
-    }
-}
-
-class Shader {
-    public int VAO;
-    public int VBO;
-    public int SHADER_PROGRAM;
-
-    private int SHADER_ATTRIBUTE_LEN;
-
-    private int SHADER_CURRENT_INDEX = 0;
-    private int SHADER_CURRENT_SIZE = 0;
-
-    public Shader(int SHADER_ATTRIBUTE_LEN) throws IOException {
-        this.SHADER_ATTRIBUTE_LEN = SHADER_ATTRIBUTE_LEN;
-        this.SHADER_PROGRAM = ShaderUtils.createShaderProgram();
-        GL20.glUseProgram(SHADER_PROGRAM);
-    }
-
-    public void Init(FloatBuffer VertexData) {
-        Init_VAO();
-        Init_VBO();
-        GL30.glBindVertexArray(VAO);
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, VBO);
-        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, VertexData, GL15.GL_STATIC_DRAW);
-    }
-
-    public void AddVertexAttrib(int SIZE) {
-        GL20.glVertexAttribPointer(SHADER_CURRENT_INDEX,
-                SIZE,
-                GL11.GL_FLOAT, true,
-                SHADER_ATTRIBUTE_LEN * Float.BYTES,
-                SHADER_CURRENT_SIZE * Float.BYTES);
-        GL20.glEnableVertexAttribArray(SHADER_CURRENT_INDEX++);
-        SHADER_CURRENT_SIZE += SIZE;
-    }
-
-    public void AddUniformAttrib1f(float V0, CharSequence NAME) {
-        int uniformLocation = GL20.glGetUniformLocation(SHADER_PROGRAM, NAME);
-        GL20.glUniform1f(uniformLocation, V0);
-    }
-
-    public void AddUniformAttrib2f(float V0, float V1, CharSequence NAME) {
-        int uniformLocation = GL20.glGetUniformLocation(SHADER_PROGRAM, NAME);
-        GL20.glUniform2f(uniformLocation, V0, V1);
-    }
-
-    public void AddUniformAttrib3f(float V0, float V1, float V2, CharSequence NAME) {
-        int uniformLocation = GL20.glGetUniformLocation(SHADER_PROGRAM, NAME);
-        GL20.glUniform3f(uniformLocation, V0, V1, V2);
-    }
-
-    public void AddUniformAttrib4f(float V0, float V1, float V2, float V3, CharSequence NAME) {
-        int uniformLocation = GL20.glGetUniformLocation(SHADER_PROGRAM, NAME);
-        GL20.glUniform4f(uniformLocation, V0, V1, V2, V3);
-    }
-
-    private void Init_VAO() {
-        this.VAO = GL30.glGenVertexArrays();
-    }
-
-    private void Init_VBO() {
-        this.VBO = GL15.glGenBuffers();
+    public float[] getMesh() {
+        return POINT_POSITIONS;
     }
 }

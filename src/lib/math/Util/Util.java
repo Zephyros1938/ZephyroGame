@@ -20,4 +20,16 @@ public class Util {
     public static float lerp(float t, float a, float b) {
         return a + t * (b - a);
     }
+
+    public static float[] createPerspectiveMatrix(float fov, float aspect, float near, float far) {
+        float f = 1.0f / (float) Math.tan(Math.toRadians(fov) / 2.0f);
+        float range = near - far;
+
+        return new float[] {
+                f / aspect, 0, 0, 0,
+                0, f, 0, 0,
+                0, 0, (far + near) / range, -1,
+                0, 0, (2 * far * near) / range, 0
+        };
+    }
 }
