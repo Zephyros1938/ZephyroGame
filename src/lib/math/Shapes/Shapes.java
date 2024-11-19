@@ -1,6 +1,6 @@
 package lib.math.Shapes;
 
-public class Shapes extends lib.math.Vector.Vector {
+public class Shapes extends lib.math.Vector {
     public class Triangle {
         public Vector2 BL, TP, BR;
 

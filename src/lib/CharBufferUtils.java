@@ -1,4 +1,4 @@
-package lib.CharBufferUtils;
+package lib;
 
 import java.nio.CharBuffer;
 

@@ -1,4 +1,4 @@
-package lib.math.Util;
+package lib.math;
 
 public class Util {
     public static int clampInt(int val, int min, int max) {

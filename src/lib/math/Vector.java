@@ -1,4 +1,4 @@
-package lib.math.Vector;
+package lib.math;
 
 public class Vector {
 

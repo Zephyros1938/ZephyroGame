@@ -1,19 +1,12 @@
 package game.Display;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
-import java.nio.FloatBuffer;
 
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWKeyCallback;
-import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL15;
-import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
-import org.lwjgl.system.MemoryUtil;
-import org.lwjgl.system.windows.POINT;
+
 import org.joml.*;
 
 public class Display {
@@ -141,168 +134,6 @@ class Keyboard extends GLFWKeyCallback {
     }
 }
 
-class ShaderUtils {
-    public static int loadShader(String filepath, int type) throws IOException {
-        StringBuilder shaderSource = new StringBuilder();
-        try (BufferedReader reader = new BufferedReader(new FileReader(filepath))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                shaderSource.append(line).append("\n");
-            }
-        }
-        int shaderID = GL20.glCreateShader(type);
-        GL20.glShaderSource(shaderID, shaderSource);
-        GL20.glCompileShader(shaderID);
-        if (GL20.glGetShaderi(shaderID, GL20.GL_COMPILE_STATUS) == GL11.GL_FALSE) {
-            throw new RuntimeException("Error creating shader: " + GL20.glGetShaderInfoLog(shaderID));
-        }
-        return shaderID;
-    }
-
-    public static int createShaderProgram() throws IOException {
-        int vertexShader = loadShader("src/game/Display/Shaders/default_vert.glsl", GL20.GL_VERTEX_SHADER);
-        int fragmentShader = loadShader("src/game/Display/Shaders/default_frag.glsl", GL20.GL_FRAGMENT_SHADER);
-        int shaderProgram = GL20.glCreateProgram();
-        GL20.glAttachShader(shaderProgram, vertexShader);
-        GL20.glAttachShader(shaderProgram, fragmentShader);
-        GL20.glLinkProgram(shaderProgram);
-        if (GL20.glGetProgrami(shaderProgram, GL20.GL_LINK_STATUS) == GL11.GL_FALSE) {
-            throw new RuntimeException("Error linking program: " + GL20.glGetProgramInfoLog(shaderProgram));
-        }
-        GL20.glDeleteShader(vertexShader);
-        GL20.glDeleteShader(fragmentShader);
-        return shaderProgram;
-    }
-}
-
-class Window {
-    private int SCREEN_HEIGHT = 720;
-    private int SCREEN_WIDTH = 720;
-    private CharSequence TITLE = "Default Window Title";
-    private long MONITOR = 0;
-    private long SHARE = 0;
-
-    public long WINDOW;
-
-    private Shader[] SHADER_LIST = new Shader[0];
-
-    public Window(int SCREEN_WIDTH, int SCREEN_HEIGHT) {
-        this.SCREEN_WIDTH = SCREEN_WIDTH;
-        this.SCREEN_HEIGHT = SCREEN_HEIGHT;
-    }
-
-    public Window(int SCREEN_WIDTH, int SCREEN_HEIGHT, CharSequence TITLE) {
-        this.SCREEN_WIDTH = SCREEN_WIDTH;
-        this.SCREEN_HEIGHT = SCREEN_HEIGHT;
-        this.TITLE = TITLE;
-    }
-
-    public Window(int SCREEN_WIDTH, int SCREEN_HEIGHT, CharSequence TITLE, long MONITOR, long SHARE) {
-        this.SCREEN_WIDTH = SCREEN_WIDTH;
-        this.SCREEN_HEIGHT = SCREEN_HEIGHT;
-        this.TITLE = TITLE;
-        this.MONITOR = MONITOR;
-        this.SHARE = SHARE;
-    }
-
-    public void Init() {
-        if (!GLFW.glfwInit())
-            throw new IllegalStateException("Unable to initialize GLFW");
-        WINDOW = GLFW.glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, TITLE, MONITOR, SHARE);
-        GLFW.glfwSetKeyCallback(WINDOW, new Keyboard());
-        if (WINDOW == 0)
-            throw new RuntimeException("Failed to create the GLFW window.");
-
-        GLFW.glfwMakeContextCurrent(WINDOW);
-        GL.createCapabilities();
-        GL20.glEnable(GL20.GL_DEPTH_TEST);
-    }
-
-    public void addShader(Shader s) {
-        int SHADER_LIST_LEN = SHADER_LIST.length;
-        SHADER_LIST = new Shader[SHADER_LIST_LEN + 1];
-        SHADER_LIST[SHADER_LIST_LEN] = s;
-    }
-
-    public void Terminate() {
-        for (Shader s : SHADER_LIST) {
-            GL20.glDeleteProgram(s.SHADER_PROGRAM);
-            GL15.glDeleteBuffers(s.VBO);
-            GL30.glDeleteVertexArrays(s.VAO);
-        }
-        GLFW.glfwDestroyWindow(WINDOW);
-        GLFW.glfwTerminate();
-    }
-}
-
-class Shader {
-    public int VAO;
-    public int VBO;
-    public int SHADER_PROGRAM;
-
-    private int SHADER_ATTRIBUTE_LEN;
-
-    private int SHADER_CURRENT_INDEX = 0;
-    private int SHADER_CURRENT_SIZE = 0;
-
-    public Shader(int SHADER_ATTRIBUTE_LEN) throws IOException {
-        this.SHADER_ATTRIBUTE_LEN = SHADER_ATTRIBUTE_LEN;
-        this.SHADER_PROGRAM = ShaderUtils.createShaderProgram();
-        GL20.glUseProgram(SHADER_PROGRAM);
-    }
-
-    public void Init(FloatBuffer vertices) {
-        FloatBuffer verticesBuffer = vertices;
-
-        Init_VAO();
-        Init_VBO();
-        GL30.glBindVertexArray(VAO);
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, VBO);
-        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, verticesBuffer, GL15.GL_STATIC_DRAW);
-        if (verticesBuffer != null) {
-            MemoryUtil.memFree(verticesBuffer);
-        }
-    }
-
-    public void AddVertexAttrib(int SIZE) {
-        GL20.glVertexAttribPointer(SHADER_CURRENT_INDEX,
-                SIZE,
-                GL11.GL_FLOAT, true,
-                SHADER_ATTRIBUTE_LEN * Float.BYTES,
-                SHADER_CURRENT_SIZE * Float.BYTES);
-        GL20.glEnableVertexAttribArray(SHADER_CURRENT_INDEX++);
-        SHADER_CURRENT_SIZE += SIZE;
-    }
-
-    public void AddUniformAttrib1f(float V0, CharSequence NAME) {
-        int uniformLocation = GL20.glGetUniformLocation(SHADER_PROGRAM, NAME);
-        GL20.glUniform1f(uniformLocation, V0);
-    }
-
-    public void AddUniformAttrib2f(float V0, float V1, CharSequence NAME) {
-        int uniformLocation = GL20.glGetUniformLocation(SHADER_PROGRAM, NAME);
-        GL20.glUniform2f(uniformLocation, V0, V1);
-    }
-
-    public void AddUniformAttrib3f(float V0, float V1, float V2, CharSequence NAME) {
-        int uniformLocation = GL20.glGetUniformLocation(SHADER_PROGRAM, NAME);
-        GL20.glUniform3f(uniformLocation, V0, V1, V2);
-    }
-
-    public void AddUniformAttrib4f(float V0, float V1, float V2, float V3, CharSequence NAME) {
-        int uniformLocation = GL20.glGetUniformLocation(SHADER_PROGRAM, NAME);
-        GL20.glUniform4f(uniformLocation, V0, V1, V2, V3);
-    }
-
-    private void Init_VAO() {
-        this.VAO = GL30.glGenVertexArrays();
-    }
-
-    private void Init_VBO() {
-        this.VBO = GL15.glGenBuffers();
-    }
-}
-
 class Timer {
     private double lastLoopTime;
     private float timeCount;
@@ -357,40 +188,3 @@ class Timer {
     }
 }
 
-class Mesh {
-
-    private FloatBuffer POINT_POSITIONS = MemoryUtil.memAllocFloat((9 * 3) * 100);
-
-    private int POINT_POSITIONS_CAPACITY = 0;
-
-    private boolean ALREADY_INITIALIZED = false;
-
-    public Mesh(float[] pointPositions) {
-        checkInitialization();
-        this.POINT_POSITIONS.put(pointPositions).flip();
-        POINT_POSITIONS_CAPACITY += 27;
-        ALREADY_INITIALIZED = true;
-    }
-
-    public Mesh(Matrix3f pointPositions) {
-        checkInitialization();
-        pointPositions.get(POINT_POSITIONS_CAPACITY, POINT_POSITIONS);
-        POINT_POSITIONS_CAPACITY += 27;
-        ALREADY_INITIALIZED = true;
-    }
-
-    private void checkInitialization() {
-        if (ALREADY_INITIALIZED) {
-            throw new IllegalStateException("Mesh has already been initialized, cannot re-initialize mesh.");
-        }
-    }
-
-    public void addTriangle(Matrix3f pointPositions) {
-        pointPositions.get(POINT_POSITIONS_CAPACITY, POINT_POSITIONS);
-        POINT_POSITIONS_CAPACITY += 27;
-    }
-
-    public FloatBuffer getMesh() {
-        return POINT_POSITIONS;
-    }
-}

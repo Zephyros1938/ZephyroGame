@@ -1,4 +1,4 @@
-package lib.HexDecoder;
+package lib;
 
 public class HexDecoder {
     public static int[] Bit_24(int x) { // Convert integer into 24-Bit hex (TrueColor)

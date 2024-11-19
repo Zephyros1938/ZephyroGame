@@ -1,4 +1,4 @@
-package lib.math.PerlinNoise;
+package lib.math;
 
 /*
  * RESOURCES:
@@ -6,8 +6,6 @@ package lib.math.PerlinNoise;
  */
 
 import java.util.Random;
-
-import lib.math.Util.Util;
 
 public class PerlinNoise {
     private static final int GRADIENT_SIZE = 256;

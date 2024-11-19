@@ -1,4 +1,4 @@
-package lib.math.Shapes.LWJGL;
+package lib.math.Shapes;
 
 public class ShapesLWJGL {
     public static class TriangleData {
