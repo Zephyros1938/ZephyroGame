@@ -69,6 +69,8 @@ public class Display {
         defaultShader.AddVertexAttrib(SHADER_COORD_LEN); // Triangle vertex positions
 
         window.addShader(defaultShader);
+
+        Texture t = TextureUtils.loadTexture("Default.png");
     }
 
     public void gameLoop() {
