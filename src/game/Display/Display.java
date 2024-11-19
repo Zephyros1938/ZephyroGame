@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
 import org.joml.*;
@@ -67,6 +68,8 @@ public class Display {
 
         defaultShader.Init(testMesh.getMesh());
         defaultShader.AddVertexAttrib(SHADER_COORD_LEN); // Triangle vertex positions
+
+        GL20.glEnable(GL20.GL_TEXTURE_2D);
 
         window.addShader(defaultShader);
 
