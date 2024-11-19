@@ -15,7 +15,7 @@ import org.lwjgl.opengl.GLUtil;
 
 import de.matthiasmann.twl.utils.PNGDecoder;
 
-public class TextureUtils {
+public class TextureUtils { // Possibly Useful: https://github.com/mattdesl/lwjgl-basics/wiki/textures
     public static Texture loadTexture(String fileName) throws IOException {
         PNGDecoder decoder;
 
