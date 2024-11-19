@@ -48,7 +48,7 @@ public class Display {
 
     Shader defaultShader;
 
-    public void Initialize() throws IOException {
+    public void init() throws IOException {
 
         window = new Window(SCREEN_WIDTH, SCREEN_HEIGHT, "Window", 0, 0);
         window.Init();
@@ -71,7 +71,7 @@ public class Display {
         window.addShader(defaultShader);
     }
 
-    public void GameLoop() {
+    public void gameLoop() {
         Timer timer = new Timer();
 
         float delta;
@@ -106,14 +106,14 @@ public class Display {
 
     }
 
-    public void Dispose() { // Cleanup the shaders & buffers on kill
+    public void dispose() { // Cleanup the shaders & buffers on kill
         window.Terminate();
     }
 
-    public void Run() throws IOException {
-        Initialize();
-        GameLoop();
-        Dispose();
+    public void run() throws IOException {
+        init();
+        gameLoop();
+        dispose();
     }
 }
 
@@ -133,58 +133,3 @@ class Keyboard extends GLFWKeyCallback {
         return keys[keycode];
     }
 }
-
-class Timer {
-    private double lastLoopTime;
-    private float timeCount;
-    private int fpsCount, upsCount, fps, ups;
-
-    private double getTime() {
-        return System.nanoTime() / 1000000000.0;
-    }
-
-    public void Init() {
-        lastLoopTime = getTime();
-    }
-
-    public float getDelta() {
-        double time = getTime();
-        float delta = (float) (time - lastLoopTime);
-        lastLoopTime = time;
-        timeCount += delta;
-        return delta;
-    }
-
-    public void updateFPS() {
-        fpsCount++;
-    }
-
-    public void updateUPS() {
-        upsCount++;
-    }
-
-    public void update() {
-        if (timeCount > 1f) {
-            fps = fpsCount;
-            fpsCount = 0;
-
-            ups = upsCount;
-            upsCount = 0;
-
-            timeCount -= 1f;
-        }
-    }
-
-    public int getUPS() {
-        return ups > 0 ? ups : upsCount;
-    }
-
-    public int getFPS() {
-        return fps > 0 ? fps : fpsCount;
-    }
-
-    public double getLastLoopTime() {
-        return lastLoopTime;
-    }
-}
-

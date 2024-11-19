@@ -24,9 +24,9 @@ public class ShaderUtils {
         return shaderID;
     }
 
-    public static int createShaderProgram() throws IOException {
-        int vertexShader = loadShader("src/game/Display/Shaders/default_vert.glsl", GL20.GL_VERTEX_SHADER);
-        int fragmentShader = loadShader("src/game/Display/Shaders/default_frag.glsl", GL20.GL_FRAGMENT_SHADER);
+    public static int createShaderProgram(String vertexLocation, String fragmentLocation) throws IOException {
+        int vertexShader = loadShader("src/game/Display/Shaders/" + vertexLocation, GL20.GL_VERTEX_SHADER);
+        int fragmentShader = loadShader("src/game/Display/Shaders/" + fragmentLocation, GL20.GL_FRAGMENT_SHADER);
         int shaderProgram = GL20.glCreateProgram();
         GL20.glAttachShader(shaderProgram, vertexShader);
         GL20.glAttachShader(shaderProgram, fragmentShader);

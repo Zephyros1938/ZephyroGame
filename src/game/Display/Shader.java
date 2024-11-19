@@ -21,7 +21,7 @@ public class Shader {
 
     public Shader(int SHADER_ATTRIBUTE_LEN) throws IOException {
         this.SHADER_ATTRIBUTE_LEN = SHADER_ATTRIBUTE_LEN;
-        this.SHADER_PROGRAM = ShaderUtils.createShaderProgram();
+        this.SHADER_PROGRAM = ShaderUtils.createShaderProgram("default_vert.glsl", "default_frag.glsl");
         GL20.glUseProgram(SHADER_PROGRAM);
     }
 
