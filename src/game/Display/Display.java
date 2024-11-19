@@ -13,7 +13,7 @@ import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.system.MemoryUtil;
-
+import org.lwjgl.system.windows.POINT;
 import org.joml.*;
 
 public class Display {
@@ -62,11 +62,15 @@ public class Display {
 
         defaultShader = new Shader(SHADER_ATTRIBUTE_LEN);
 
-        Mesh testMesh = new Mesh( new float[]{
-            -.5f, 0.5f, 0.0f,
-            0.5f, 0.0f, 0.0f,
-            -.5f, -.5f, 0.0f
-        });
+        Mesh testMesh = new Mesh(new Matrix3f(
+                -.5f, 0.5f, 0f,
+                -.5f, -.5f, 0f,
+                0.5f, -.5f, 0f));
+
+        testMesh.addTriangle(new Matrix3f(
+                -.5f, 0.5f, 0f,
+                0.5f, 0.5f, 0f,
+                0.5f, -.5f, 0f));
 
         defaultShader.Init(testMesh.getMesh());
         defaultShader.AddVertexAttrib(SHADER_COORD_LEN); // Triangle vertex positions
@@ -125,7 +129,8 @@ class Keyboard extends GLFWKeyCallback {
 
     @Override
     public void invoke(long window, int key, int scancode, int action, int mods) {
-        if (key < 0) { // <- ❗️ IMPORTANT: This line is added to prevent `ArrayIndexOutOfBoundsException` in some cases.
+        if (key < 0) { // <- ❗️ IMPORTANT: This line is added to prevent
+                       // `ArrayIndexOutOfBoundsException` in some cases.
             return;
         }
         keys[key] = action != GLFW.GLFW_RELEASE;
@@ -246,9 +251,8 @@ class Shader {
         GL20.glUseProgram(SHADER_PROGRAM);
     }
 
-    public void Init(float[] vertices) {
-        FloatBuffer verticesBuffer = MemoryUtil.memAllocFloat(vertices.length);
-        verticesBuffer.put(vertices).flip();
+    public void Init(FloatBuffer vertices) {
+        FloatBuffer verticesBuffer = vertices;
 
         Init_VAO();
         Init_VBO();
@@ -355,13 +359,38 @@ class Timer {
 
 class Mesh {
 
-    private float[] POINT_POSITIONS;
+    private FloatBuffer POINT_POSITIONS = MemoryUtil.memAllocFloat((9 * 3) * 100);
+
+    private int POINT_POSITIONS_CAPACITY = 0;
+
+    private boolean ALREADY_INITIALIZED = false;
 
     public Mesh(float[] pointPositions) {
-        this.POINT_POSITIONS = pointPositions;
+        checkInitialization();
+        this.POINT_POSITIONS.put(pointPositions).flip();
+        POINT_POSITIONS_CAPACITY += 27;
+        ALREADY_INITIALIZED = true;
     }
 
-    public float[] getMesh() {
+    public Mesh(Matrix3f pointPositions) {
+        checkInitialization();
+        pointPositions.get(POINT_POSITIONS_CAPACITY, POINT_POSITIONS);
+        POINT_POSITIONS_CAPACITY += 27;
+        ALREADY_INITIALIZED = true;
+    }
+
+    private void checkInitialization() {
+        if (ALREADY_INITIALIZED) {
+            throw new IllegalStateException("Mesh has already been initialized, cannot re-initialize mesh.");
+        }
+    }
+
+    public void addTriangle(Matrix3f pointPositions) {
+        pointPositions.get(POINT_POSITIONS_CAPACITY, POINT_POSITIONS);
+        POINT_POSITIONS_CAPACITY += 27;
+    }
+
+    public FloatBuffer getMesh() {
         return POINT_POSITIONS;
     }
 }
