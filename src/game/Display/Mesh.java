@@ -7,42 +7,29 @@ import org.lwjgl.system.MemoryUtil;
 
 public class Mesh {
 
-    private FloatBuffer POINT_POSITIONS = MemoryUtil.memAllocFloat((3 * 3 * 2 * 6) * 256);
+    private final FloatBuffer POINT_POSITIONS = MemoryUtil.memAllocFloat((3 * 3 * 2 * 6) * 256);
+    private final int MESH_SIZE_COORDINATES_INCREMENT = 9;
+    private final int POINT_POSITIONS_CAPACITY_INCREMENT = MESH_SIZE_COORDINATES_INCREMENT * 3;
 
     private int POINT_POSITIONS_CAPACITY = 0;
+    public int MESH_SIZE_COORDINATES = 0;
 
     private boolean ALREADY_INITIALIZED = false;
-
-    private CharSequence NAME = "Unnamed";
 
     public Mesh(float[] pointPositions) {
         checkInitialization();
         this.POINT_POSITIONS.put(pointPositions).flip();
-        POINT_POSITIONS_CAPACITY += 27;
+        POINT_POSITIONS_CAPACITY += POINT_POSITIONS_CAPACITY_INCREMENT;
+        MESH_SIZE_COORDINATES += MESH_SIZE_COORDINATES_INCREMENT;
         ALREADY_INITIALIZED = true;
     }
 
     public Mesh(Matrix3f pointPositions) {
         checkInitialization();
         pointPositions.get(POINT_POSITIONS_CAPACITY, POINT_POSITIONS);
-        POINT_POSITIONS_CAPACITY += 27;
+        POINT_POSITIONS_CAPACITY += POINT_POSITIONS_CAPACITY_INCREMENT;
+        MESH_SIZE_COORDINATES += MESH_SIZE_COORDINATES_INCREMENT;
         ALREADY_INITIALIZED = true;
-    }
-
-    public Mesh(float[] pointPositions, CharSequence name) {
-        checkInitialization();
-        this.POINT_POSITIONS.put(pointPositions).flip();
-        POINT_POSITIONS_CAPACITY += 27;
-        this.NAME = name;
-        this.ALREADY_INITIALIZED = true;
-    }
-
-    public Mesh(Matrix3f pointPositions, CharSequence name) {
-        checkInitialization();
-        pointPositions.get(POINT_POSITIONS_CAPACITY, POINT_POSITIONS);
-        POINT_POSITIONS_CAPACITY += 27;
-        this.NAME = name;
-        this.ALREADY_INITIALIZED = true;
     }
 
     private void checkInitialization() {
@@ -53,10 +40,15 @@ public class Mesh {
 
     public void addTriangle(Matrix3f pointPositions) {
         pointPositions.get(POINT_POSITIONS_CAPACITY, POINT_POSITIONS);
-        POINT_POSITIONS_CAPACITY += 27;
+        POINT_POSITIONS_CAPACITY += POINT_POSITIONS_CAPACITY_INCREMENT;
+        MESH_SIZE_COORDINATES += MESH_SIZE_COORDINATES_INCREMENT;
     }
 
     public FloatBuffer getMesh() {
         return POINT_POSITIONS;
+    }
+
+    public int getLength() {
+        return POINT_POSITIONS.capacity();
     }
 }

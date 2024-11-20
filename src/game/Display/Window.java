@@ -2,8 +2,6 @@ package game.Display;
 
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL;
-import org.lwjgl.opengl.GL15;
-import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
 public class Window {
@@ -13,9 +11,9 @@ public class Window {
     private long MONITOR = 0;
     private long SHARE = 0;
 
-    public long WINDOW;
-
     private Shader[] SHADER_LIST = new Shader[0];
+
+    public long WINDOW;
 
     public Window(int SCREEN_WIDTH, int SCREEN_HEIGHT) {
         this.SCREEN_WIDTH = SCREEN_WIDTH;
@@ -36,7 +34,7 @@ public class Window {
         this.SHARE = SHARE;
     }
 
-    public void Init() {
+    public void init() {
         if (!GLFW.glfwInit())
             throw new IllegalStateException("Unable to initialize GLFW");
         WINDOW = GLFW.glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, TITLE, MONITOR, SHARE);
@@ -46,7 +44,8 @@ public class Window {
 
         GLFW.glfwMakeContextCurrent(WINDOW);
         GL.createCapabilities();
-        GL20.glEnable(GL20.GL_DEPTH_TEST);
+        GL30.glEnable(GL30.GL_DEPTH_TEST);
+        GL30.glEnable(GL30.GL_TEXTURE_2D);
     }
 
     public void addShader(Shader s) {
@@ -55,10 +54,10 @@ public class Window {
         SHADER_LIST[SHADER_LIST_LEN] = s;
     }
 
-    public void Terminate() {
+    public void terminate() {
         for (Shader s : SHADER_LIST) {
-            GL20.glDeleteProgram(s.SHADER_PROGRAM);
-            GL15.glDeleteBuffers(s.VBO);
+            GL30.glDeleteProgram(s.SHADER_PROGRAM);
+            GL30.glDeleteBuffers(s.VBO);
             GL30.glDeleteVertexArrays(s.VAO);
         }
         GLFW.glfwDestroyWindow(WINDOW);

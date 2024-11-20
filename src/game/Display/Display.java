@@ -4,8 +4,6 @@ import java.io.IOException;
 
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWKeyCallback;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
 import org.joml.*;
@@ -13,33 +11,8 @@ import org.joml.*;
 public class Display {
 
     private static Window window;
-    static private int SCREEN_WIDTH;
-    static private int SCREEN_HEIGHT;
-
-    static private final int Xdim = 4, Ydim = 4;
-
-    static public int Screen = Xdim * Ydim;
-
-    static final float incrX = (1f / Xdim), incrY = (1f / Ydim);
-
-    static final int SHADER_VERT_COUNT = 3;
-    static final int SHADER_COORD_LEN = 3;
-    static final int SHADER_ATTRIBUTE_LEN = SHADER_COORD_LEN;
-    static final int SHADER_TOTAL_LEN = SHADER_ATTRIBUTE_LEN * SHADER_VERT_COUNT;
-
-    static private float[] vertices = new float[27];
-
-    static int index = 0;
-
-    static void DrawTriangle(float x, float y, float z) {
-        if (index + SHADER_TOTAL_LEN > vertices.length) {
-            System.err.println("Vertex buffer overflow at " + index + "!");
-            return;
-        }
-        vertices[index++] = x; // X
-        vertices[index++] = y; // Y
-        vertices[index++] = z;
-    }
+    private static int SCREEN_WIDTH;
+    private static int SCREEN_HEIGHT;
 
     @SuppressWarnings("static-access")
     public Display(int SCREEN_X, int SCREEN_Y) {
@@ -49,14 +22,16 @@ public class Display {
 
     Shader defaultShader;
 
+    Mesh testMesh;
+
     public void init() throws IOException {
 
         window = new Window(SCREEN_WIDTH, SCREEN_HEIGHT, "Window", 0, 0);
-        window.Init();
+        window.init();
 
-        defaultShader = new Shader(SHADER_ATTRIBUTE_LEN);
+        defaultShader = new Shader(Shader.SHADER_COORD_LEN_3);
 
-        Mesh testMesh = new Mesh(new Matrix3f(
+        testMesh = new Mesh(new Matrix3f(
                 -.5f, 0.5f, 0f,
                 -.5f, -.5f, 0f,
                 0.5f, -.5f, 0f));
@@ -66,14 +41,12 @@ public class Display {
                 0.5f, 0.5f, 0f,
                 0.5f, -.5f, 0f));
 
-        defaultShader.Init(testMesh.getMesh());
-        defaultShader.AddVertexAttrib(SHADER_COORD_LEN); // Triangle vertex positions
+        defaultShader.init(testMesh.getMesh());
+        defaultShader.addVertexAttrib(Shader.SHADER_COORD_LEN_3); // Triangle vertex positions
 
-        GL20.glEnable(GL20.GL_TEXTURE_2D);
+        defaultShader.use();
 
         window.addShader(defaultShader);
-
-        Texture t = TextureUtils.loadTexture("Default.png");
     }
 
     public void gameLoop() {
@@ -94,11 +67,11 @@ public class Display {
             }
 
             // RENDER
-            GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT | GL11.GL_STENCIL_BUFFER_BIT
-                    | GL11.GL_ACCUM_BUFFER_BIT);
+            GL30.glClear(GL30.GL_COLOR_BUFFER_BIT | GL30.GL_DEPTH_BUFFER_BIT | GL30.GL_STENCIL_BUFFER_BIT
+                    | GL30.GL_ACCUM_BUFFER_BIT);
 
             GL30.glBindVertexArray(defaultShader.VAO);
-            GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, vertices.length);
+            GL30.glDrawArrays(GL30.GL_TRIANGLES, 0, testMesh.MESH_SIZE_COORDINATES);
             GL30.glBindVertexArray(0);
 
             // UPDATE
@@ -112,12 +85,18 @@ public class Display {
     }
 
     public void dispose() { // Cleanup the shaders & buffers on kill
-        window.Terminate();
+        window.terminate();
     }
 
     public void run() throws IOException {
-        init();
-        gameLoop();
+        try {
+            init();
+        } catch (Exception e) {
+            e.printStackTrace();
+            dispose();
+        } finally {
+            gameLoop();
+        }
         dispose();
     }
 }
