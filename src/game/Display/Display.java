@@ -70,7 +70,7 @@ public class Display {
             GL30.glClear(GL30.GL_COLOR_BUFFER_BIT | GL30.GL_DEPTH_BUFFER_BIT | GL30.GL_STENCIL_BUFFER_BIT
                     | GL30.GL_ACCUM_BUFFER_BIT);
 
-            GL30.glBindVertexArray(defaultShader.VAO);
+             GL30.glBindVertexArray(defaultShader.VAO);
             GL30.glDrawArrays(GL30.GL_TRIANGLES, 0, testMesh.MESH_SIZE_COORDINATES);
             GL30.glBindVertexArray(0);
 
