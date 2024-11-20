@@ -1,6 +1,7 @@
 package game.Display;
 
 import java.io.IOException;
+import java.nio.FloatBuffer;
 
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWKeyCallback;
@@ -25,7 +26,7 @@ public class Display {
         window = new Window(SCREEN_WIDTH, SCREEN_HEIGHT, "Window", 0, 0);
         window.init();
 
-        Shader defaultShader = new Shader(Shader.SHADER_COORD_LEN_3);
+        Shader defaultShader = new Shader(Shader.SHADER_COORD_LEN_3 + Shader.SHADER_TEX_COORD_LEN);
 
         Mesh testMesh = new Mesh(new Matrix3f(
                 -.5f, 0.5f, 0f,
@@ -37,10 +38,14 @@ public class Display {
                 0.5f, 0.5f, 0f,
                 0.5f, -.5f, 0f));
 
-        defaultShader.init(testMesh.getMesh());
-        defaultShader.addVertexAttrib(Shader.SHADER_COORD_LEN_3); // Triangle vertex positions
+        defaultShader.init(32,32,0.25f,0.25f);
+        defaultShader.addVertexCoords(testMesh.getMesh()); // Triangle vertex positions
+        defaultShader.addTexCoords(new float[]{0f,0f,0f,1f,1f,1f,1f,0f});
 
-        defaultShader.use();
+        Texture testTexture = new Texture("Default.png", "Default", 4, 4);
+
+        defaultShader.bindTexture(testTexture, 1, 1);
+
         ShaderObject defaultShaderObject = new ShaderObject(defaultShader, testMesh);
 
         window.addShaderObject(defaultShaderObject);

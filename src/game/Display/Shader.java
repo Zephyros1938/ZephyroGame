@@ -9,16 +9,18 @@ import org.lwjgl.system.MemoryUtil;
 public class Shader {
 
     public static final int SHADER_COORD_LEN_3 = 3;
-    public static final int SHADER_COORD_LEN_4 = 4;
+    public static final int SHADER_TEX_COORD_LEN = 4;
 
-    public int VAO;
-    public int VBO;
+    public int VAO = GL30.glGenVertexArrays();
+    public int VBO = GL30.glGenBuffers();
+    public int TBO = GL30.glGenBuffers();
     public int SHADER_PROGRAM;
 
     private int SHADER_ATTRIBUTE_LEN;
 
     private int SHADER_CURRENT_INDEX = 0;
     private int SHADER_CURRENT_SIZE = 0;
+    private int SHADER_CURRENT_TEXTURE_UNIT = 0;
 
     public Shader(int SHADER_ATTRIBUTE_LEN) throws IOException {
         this.SHADER_ATTRIBUTE_LEN = SHADER_ATTRIBUTE_LEN;
@@ -29,20 +31,38 @@ public class Shader {
         GL30.glUseProgram(SHADER_PROGRAM);
     }
 
-    public void init(FloatBuffer vertices) {
-        FloatBuffer verticesBuffer = vertices;
-
-        init_VAO();
-        init_VBO();
+    public void init(int TEX_WIDTH, int TEX_HEIGHT, float TEX_U, float TEX_V) {
         GL30.glBindVertexArray(VAO);
-        GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, VBO);
-        GL30.glBufferData(GL30.GL_ARRAY_BUFFER, verticesBuffer, GL30.GL_STATIC_DRAW);
-        if (verticesBuffer != null) {
-            MemoryUtil.memFree(verticesBuffer);
-        }
     }
 
-    public void addVertexAttrib(int SIZE) {
+    public void addVertexData(FloatBuffer data) { // TODO: Complete this
+    }
+
+    public void addVertexCoords(FloatBuffer vertices) {
+        GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, VBO);
+        GL30.glBufferData(GL30.GL_ARRAY_BUFFER, vertices, GL30.GL_STATIC_DRAW);
+        GL30.glVertexAttribPointer(0,
+                SHADER_COORD_LEN_3,
+                GL30.GL_FLOAT, true,
+                SHADER_COORD_LEN_3 * Float.BYTES,
+                SHADER_CURRENT_SIZE * Float.BYTES);
+        GL30.glEnableVertexAttribArray(SHADER_CURRENT_INDEX++);
+        SHADER_CURRENT_SIZE += SHADER_COORD_LEN_3;
+    }
+
+    public void addTexCoords(float[] TEX_COORDS) {
+        GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, TBO);
+        GL30.glBufferData(GL30.GL_ARRAY_BUFFER, TEX_COORDS, GL30.GL_STATIC_DRAW);
+        GL30.glVertexAttribPointer(1,
+                SHADER_TEX_COORD_LEN,
+                GL30.GL_FLOAT, true,
+                SHADER_TEX_COORD_LEN * Float.BYTES,
+                SHADER_CURRENT_SIZE * Float.BYTES);
+        GL30.glEnableVertexAttribArray(SHADER_CURRENT_INDEX++);
+        SHADER_CURRENT_SIZE += SHADER_TEX_COORD_LEN;
+    }
+
+    public void addVertexData(int SIZE) {
         GL30.glVertexAttribPointer(SHADER_CURRENT_INDEX,
                 SIZE,
                 GL30.GL_FLOAT, true,
@@ -72,11 +92,8 @@ public class Shader {
         GL30.glUniform4f(uniformLocation, V0, V1, V2, V3);
     }
 
-    private void init_VAO() {
-        this.VAO = GL30.glGenVertexArrays();
-    }
-
-    private void init_VBO() {
-        this.VBO = GL30.glGenBuffers();
+    public void bindTexture(Texture tex, int TEX_WIDTH, int TEX_HEIGHT) {
+        int TEX = GL30.glGetUniformLocation(SHADER_PROGRAM, tex.getName());
+        GL30.glUniform1i(TEX, SHADER_CURRENT_TEXTURE_UNIT++); // Useful : http://www.lighthouse3d.com/tutorials/glsl-tutorial/attribute-variables/
     }
 }

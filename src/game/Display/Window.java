@@ -66,6 +66,7 @@ public class Window {
 
     public void drawShaderObjects() {
         for(ShaderObject s : SHADER_OBJ_LIST) {
+            s.shader.use();
             GL30.glBindVertexArray(s.shader.VAO);
             GL30.glDrawArrays(GL30.GL_TRIANGLES, 0, s.mesh.MESH_SIZE_COORDINATES);
             GL30.glBindVertexArray(0);
