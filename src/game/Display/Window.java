@@ -11,7 +11,7 @@ public class Window {
     private long MONITOR = 0;
     private long SHARE = 0;
 
-    private Shader[] SHADER_LIST = new Shader[0];
+    private ShaderObject[] SHADER_OBJ_LIST = new ShaderObject[0];
 
     public long WINDOW;
 
@@ -48,19 +48,27 @@ public class Window {
         GL30.glEnable(GL30.GL_TEXTURE_2D);
     }
 
-    public void addShader(Shader s) {
-        int SHADER_LIST_LEN = SHADER_LIST.length;
-        SHADER_LIST = new Shader[SHADER_LIST_LEN + 1];
-        SHADER_LIST[SHADER_LIST_LEN] = s;
+    public void addShaderObject(ShaderObject shaderObject) {
+        int SHADER_OBJ_LIST_LEN = SHADER_OBJ_LIST.length;
+        SHADER_OBJ_LIST = new ShaderObject[SHADER_OBJ_LIST_LEN + 1];
+        SHADER_OBJ_LIST[SHADER_OBJ_LIST_LEN] = shaderObject;
     }
 
     public void terminate() {
-        for (Shader s : SHADER_LIST) {
-            GL30.glDeleteProgram(s.SHADER_PROGRAM);
-            GL30.glDeleteBuffers(s.VBO);
-            GL30.glDeleteVertexArrays(s.VAO);
+        for (ShaderObject s : SHADER_OBJ_LIST) {
+            GL30.glDeleteProgram(s.shader.SHADER_PROGRAM);
+            GL30.glDeleteBuffers(s.shader.VBO);
+            GL30.glDeleteVertexArrays(s.shader.VAO);
         }
         GLFW.glfwDestroyWindow(WINDOW);
         GLFW.glfwTerminate();
+    }
+
+    public void drawShaderObjects() {
+        for(ShaderObject s : SHADER_OBJ_LIST) {
+            GL30.glBindVertexArray(s.shader.VAO);
+            GL30.glDrawArrays(GL30.GL_TRIANGLES, 0, s.mesh.MESH_SIZE_COORDINATES);
+            GL30.glBindVertexArray(0);
+        }
     }
 }

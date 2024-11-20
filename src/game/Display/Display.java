@@ -20,18 +20,14 @@ public class Display {
         this.SCREEN_HEIGHT = SCREEN_Y;
     }
 
-    Shader defaultShader;
-
-    Mesh testMesh;
-
     public void init() throws IOException {
 
         window = new Window(SCREEN_WIDTH, SCREEN_HEIGHT, "Window", 0, 0);
         window.init();
 
-        defaultShader = new Shader(Shader.SHADER_COORD_LEN_3);
+        Shader defaultShader = new Shader(Shader.SHADER_COORD_LEN_3);
 
-        testMesh = new Mesh(new Matrix3f(
+        Mesh testMesh = new Mesh(new Matrix3f(
                 -.5f, 0.5f, 0f,
                 -.5f, -.5f, 0f,
                 0.5f, -.5f, 0f));
@@ -45,8 +41,9 @@ public class Display {
         defaultShader.addVertexAttrib(Shader.SHADER_COORD_LEN_3); // Triangle vertex positions
 
         defaultShader.use();
+        ShaderObject defaultShaderObject = new ShaderObject(defaultShader, testMesh);
 
-        window.addShader(defaultShader);
+        window.addShaderObject(defaultShaderObject);
     }
 
     public void gameLoop() {
@@ -70,9 +67,7 @@ public class Display {
             GL30.glClear(GL30.GL_COLOR_BUFFER_BIT | GL30.GL_DEPTH_BUFFER_BIT | GL30.GL_STENCIL_BUFFER_BIT
                     | GL30.GL_ACCUM_BUFFER_BIT);
 
-             GL30.glBindVertexArray(defaultShader.VAO);
-            GL30.glDrawArrays(GL30.GL_TRIANGLES, 0, testMesh.MESH_SIZE_COORDINATES);
-            GL30.glBindVertexArray(0);
+            window.drawShaderObjects();
 
             // UPDATE
             GLFW.glfwSwapBuffers(window.WINDOW);
