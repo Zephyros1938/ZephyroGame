@@ -7,7 +7,7 @@ import org.lwjgl.system.MemoryUtil;
 
 public class Mesh {
 
-    private final FloatBuffer POINT_POSITIONS = MemoryUtil.memAllocFloat((3 * 3 * 2 * 6) * 256);
+    private final FloatBuffer POINT_POSITIONS = MemoryUtil.memAllocFloat((int) Math.pow(2,24));
     private final int MESH_SIZE_COORDINATES_INCREMENT = 9;
     private final int POINT_POSITIONS_CAPACITY_INCREMENT = MESH_SIZE_COORDINATES_INCREMENT * 3;
 
@@ -15,6 +15,11 @@ public class Mesh {
     public int MESH_SIZE_COORDINATES = 0;
 
     private boolean ALREADY_INITIALIZED = false;
+
+    public Mesh() {
+        checkInitialization();
+        ALREADY_INITIALIZED = true;
+    }
 
     public Mesh(float[] pointPositions) {
         checkInitialization();

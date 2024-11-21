@@ -9,7 +9,7 @@ import org.lwjgl.system.MemoryUtil;
 public class Shader {
 
     public static final int SHADER_COORD_LEN_3 = 3;
-    public static final int SHADER_TEX_COORD_LEN = 4;
+    public static final int SHADER_TEX_COORD_LEN = 2;
 
     public int VAO = GL30.glGenVertexArrays();
     public int VBO = GL30.glGenBuffers();
@@ -31,17 +31,14 @@ public class Shader {
         GL30.glUseProgram(SHADER_PROGRAM);
     }
 
-    public void init(int TEX_WIDTH, int TEX_HEIGHT, float TEX_U, float TEX_V) {
+    public void init() {
         GL30.glBindVertexArray(VAO);
-    }
-
-    public void addVertexData(FloatBuffer data) { // TODO: Complete this
     }
 
     public void addVertexCoords(FloatBuffer vertices) {
         GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, VBO);
         GL30.glBufferData(GL30.GL_ARRAY_BUFFER, vertices, GL30.GL_STATIC_DRAW);
-        GL30.glVertexAttribPointer(0,
+        GL30.glVertexAttribPointer(SHADER_CURRENT_INDEX,
                 SHADER_COORD_LEN_3,
                 GL30.GL_FLOAT, true,
                 SHADER_COORD_LEN_3 * Float.BYTES,
@@ -53,7 +50,7 @@ public class Shader {
     public void addTexCoords(float[] TEX_COORDS) {
         GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, TBO);
         GL30.glBufferData(GL30.GL_ARRAY_BUFFER, TEX_COORDS, GL30.GL_STATIC_DRAW);
-        GL30.glVertexAttribPointer(1,
+        GL30.glVertexAttribPointer(SHADER_CURRENT_INDEX,
                 SHADER_TEX_COORD_LEN,
                 GL30.GL_FLOAT, true,
                 SHADER_TEX_COORD_LEN * Float.BYTES,
@@ -62,7 +59,7 @@ public class Shader {
         SHADER_CURRENT_SIZE += SHADER_TEX_COORD_LEN;
     }
 
-    public void addVertexData(int SIZE) {
+    public void addVertexAttribPointer(int SIZE) {
         GL30.glVertexAttribPointer(SHADER_CURRENT_INDEX,
                 SIZE,
                 GL30.GL_FLOAT, true,

@@ -28,19 +28,21 @@ public class Display {
 
         Shader defaultShader = new Shader(Shader.SHADER_COORD_LEN_3 + Shader.SHADER_TEX_COORD_LEN);
 
-        Mesh testMesh = new Mesh(new Matrix3f(
-                -.5f, 0.5f, 0f,
-                -.5f, -.5f, 0f,
-                0.5f, -.5f, 0f));
+        Mesh testMesh = new Mesh();
 
         testMesh.addTriangle(new Matrix3f(
-                -.5f, 0.5f, 0f,
+                0.5f, -.5f, 0f,
                 0.5f, 0.5f, 0f,
-                0.5f, -.5f, 0f));
+                -.5f, 0.5f, 0f));
 
-        defaultShader.init(32,32,0.25f,0.25f);
+        testMesh.addTriangle(new Matrix3f(
+                0.5f, -.5f, 0f,
+                -.5f, -.5f, 0f,
+                -.5f, 0.5f, 0f));
+
+        defaultShader.init();
         defaultShader.addVertexCoords(testMesh.getMesh()); // Triangle vertex positions
-        defaultShader.addTexCoords(new float[]{0f,0f,0f,1f,1f,1f,1f,0f});
+        defaultShader.addTexCoords(new float[] { 0f, 0f, 1f, 1f, 1f, 1f, 0f, 1f }); // Texture coords | Use a matrix so the 'get' method works for adding to buffer.
 
         Texture testTexture = new Texture("Default.png", "Default", 4, 4);
 
