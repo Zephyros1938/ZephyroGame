@@ -8,7 +8,7 @@ import org.lwjgl.system.MemoryUtil;
 
 public class Shader {
 
-    public static final int SHADER_COORD_LEN_3 = 3;
+    public static final int SHADER_COORD_LEN = 2;
     public static final int SHADER_TEX_COORD_LEN = 2;
 
     public int VAO = GL30.glGenVertexArrays();
@@ -39,12 +39,12 @@ public class Shader {
         GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, VBO);
         GL30.glBufferData(GL30.GL_ARRAY_BUFFER, vertices, GL30.GL_STATIC_DRAW);
         GL30.glVertexAttribPointer(SHADER_CURRENT_INDEX,
-                SHADER_COORD_LEN_3,
+                SHADER_COORD_LEN,
                 GL30.GL_FLOAT, true,
-                SHADER_COORD_LEN_3 * Float.BYTES,
+                SHADER_COORD_LEN * Float.BYTES,
                 SHADER_CURRENT_SIZE * Float.BYTES);
         GL30.glEnableVertexAttribArray(SHADER_CURRENT_INDEX++);
-        SHADER_CURRENT_SIZE += SHADER_COORD_LEN_3;
+        SHADER_CURRENT_SIZE += SHADER_COORD_LEN;
     }
 
     public void addTexCoords(float[] TEX_COORDS) {

@@ -26,23 +26,32 @@ public class Display {
         window = new Window(SCREEN_WIDTH, SCREEN_HEIGHT, "Window", 0, 0);
         window.init();
 
-        Shader defaultShader = new Shader(Shader.SHADER_COORD_LEN_3 + Shader.SHADER_TEX_COORD_LEN);
+        Shader defaultShader = new Shader(Shader.SHADER_COORD_LEN + Shader.SHADER_TEX_COORD_LEN);
 
         Mesh testMesh = new Mesh();
 
-        testMesh.addTriangle(new Matrix3f(
-                0.5f, -.5f, 0f,
-                0.5f, 0.5f, 0f,
-                -.5f, 0.5f, 0f));
+        testMesh.addTriangle(new Matrix3x2f(
+                -1f, -1f,
+                -1f, 1f,
+                1f, 1f));
 
-        testMesh.addTriangle(new Matrix3f(
-                0.5f, -.5f, 0f,
-                -.5f, -.5f, 0f,
-                -.5f, 0.5f, 0f));
+        testMesh.addTriangle(new Matrix3x2f(
+                -1f, -1f,
+                1f, -1f,
+                1f, 1f));
 
         defaultShader.init();
         defaultShader.addVertexCoords(testMesh.getMesh()); // Triangle vertex positions
-        defaultShader.addTexCoords(new float[] { 0f, 0f, 1f, 1f, 1f, 1f, 0f, 1f }); // Texture coords | Use a matrix so the 'get' method works for adding to buffer.
+        defaultShader.addTexCoords(new float[] {
+                0f, 0f,
+                -1f, 0f,
+                -1f, -1f,
+                0f, -1f,
+
+                0f, 0f,
+                1f, 0f,
+                1f, -1f,
+                0f, -1f }); // Texture coords | Use a matrix so the 'get' method works for adding to buffer.
 
         Texture testTexture = new Texture("Default.png", "Default", 4, 4);
 
