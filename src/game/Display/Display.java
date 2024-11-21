@@ -26,6 +26,9 @@ public class Display {
         window = new Window(SCREEN_WIDTH, SCREEN_HEIGHT, "Window", 0, 0);
         window.init();
 
+        Texture defaultTexture = new Texture("Default.png", "Default", 1, 1);
+        Texture sliceTestingTexture = new Texture("SliceTesting.png", "SliceTesting", 1, 1);
+
         Shader defaultShader = new Shader(Shader.SHADER_COORD_LEN + Shader.SHADER_TEX_COORD_LEN);
 
         Mesh testMesh = new Mesh();
@@ -52,10 +55,8 @@ public class Display {
                 1f, 0f,
                 1f, -1f,
                 0f, -1f }); // Texture coords | Use a matrix so the 'get' method works for adding to buffer.
-
-        Texture testTexture = new Texture("Default.png", "Default", 4, 4);
-
-        defaultShader.bindTexture(testTexture, 1, 1);
+        defaultShader.bindTexture(defaultTexture, 32, 32);
+        defaultShader.bindTexture(sliceTestingTexture, 32, 32);
 
         ShaderObject defaultShaderObject = new ShaderObject(defaultShader, testMesh);
 

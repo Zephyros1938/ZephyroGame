@@ -6,7 +6,8 @@ in vec2 tTexCoord;
 out vec4 FragColor;
 
 uniform sampler2D Default;
+uniform sampler2D SliceTesting;
 
 void main() {
-    FragColor = texture(Default, tTexCoord); // Use the interpolated color
+    FragColor = texture(SliceTesting, tTexCoord); // Use the interpolated color
 }
