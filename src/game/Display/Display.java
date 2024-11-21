@@ -1,19 +1,19 @@
 package game.Display;
 
 import java.io.IOException;
-import java.nio.FloatBuffer;
 
+import org.joml.Matrix3x2f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.opengl.GL30;
-
-import org.joml.*;
 
 public class Display {
 
     private static Window window;
     private static int SCREEN_WIDTH;
     private static int SCREEN_HEIGHT;
+
+    private final TileGenerator tileGen = new TileGenerator(0.1f);
 
     @SuppressWarnings("static-access")
     public Display(int SCREEN_X, int SCREEN_Y) {
@@ -27,40 +27,57 @@ public class Display {
         window.init();
 
         Texture defaultTexture = new Texture("Default.png", "Default", 1, 1);
-        Texture sliceTestingTexture = new Texture("SliceTesting.png", "SliceTesting", 1, 1);
+        //Texture sliceTestingTexture = new Texture("SliceTesting.png", "SliceTesting", 1, 1);
 
         Shader defaultShader = new Shader(Shader.SHADER_COORD_LEN + Shader.SHADER_TEX_COORD_LEN);
-
-        Mesh testMesh = new Mesh();
-
-        testMesh.addTriangle(new Matrix3x2f(
-                -1f, -1f,
-                -1f, 1f,
-                1f, 1f));
-
-        testMesh.addTriangle(new Matrix3x2f(
-                -1f, -1f,
-                1f, -1f,
-                1f, 1f));
-
         defaultShader.init();
-        defaultShader.addVertexCoords(testMesh.getMesh()); // Triangle vertex positions
-        defaultShader.addTexCoords(new float[] {
-                0f, 0f,
-                -1f, 0f,
-                -1f, -1f,
-                0f, -1f,
 
-                0f, 0f,
-                1f, 0f,
-                1f, -1f,
-                0f, -1f }); // Texture coords | Use a matrix so the 'get' method works for adding to buffer.
+        // defaultShader.addVertCoord(new Matrix3x2f(
+        //         -0.5f, -0.5f,
+        //         -0.5f, 0.5f,
+        //     0.51f, 0.5f));
+
+        // defaultShader.addVertCoord(new Matrix3x2f(
+        //         -0.5f, -0.5f,
+        //         0.5f, -0.5f,
+        //         0.5f, 0.5f));
+
+        // defaultShader.addVertCoord(new Matrix3x2f(
+        //         -0.5f, -1f,
+        //         -0.5f, 1f,
+        //         0.5f, 1f));
+
+        // defaultShader.addVertCoord(new Matrix3x2f(
+        //         -0.5f, -1f,
+        //         0.5f, -1f,
+        //         0.5f, 1f));
+
+        // defaultShader.addTexCoord(new Matrix2f(0f,0f,-1f,0f), new
+        // Matrix2f(-1f,-1f,0f,-1f));
+        // defaultShader.addTexCoord(new Matrix2f(0f,0f,1f,0f), new
+        // Matrix2f(1f,-1f,0f,-1f));
+
+        tileGen.GenerateTile(defaultShader, 0, 0, 1, 1);
+        tileGen.GenerateTile(defaultShader, 4, 2, 1, 1);
+
+        // defaultShader.addTexCoords(new float[] {
+        // 0f, 0f,
+        // -1f, 0f,
+        // -1f, -1f,
+        // 0f, -1f,
+
+        // 0f, 0f,
+        // 1f, 0f,
+        // 1f, -1f,
+        // 0f, -1f }); // Texture coords | Use a matrix so the 'get' method works for
+        // adding to buffer.
+
+        defaultShader.initShaderBuffers();
+
         defaultShader.bindTexture(defaultTexture, 32, 32);
-        defaultShader.bindTexture(sliceTestingTexture, 32, 32);
+        //defaultShader.bindTexture(sliceTestingTexture, 256, 256);
 
-        ShaderObject defaultShaderObject = new ShaderObject(defaultShader, testMesh);
-
-        window.addShaderObject(defaultShaderObject);
+        window.addShader(defaultShader);
     }
 
     public void gameLoop() {
@@ -84,7 +101,7 @@ public class Display {
             GL30.glClear(GL30.GL_COLOR_BUFFER_BIT | GL30.GL_DEPTH_BUFFER_BIT | GL30.GL_STENCIL_BUFFER_BIT
                     | GL30.GL_ACCUM_BUFFER_BIT);
 
-            window.drawShaderObjects();
+            window.drawShaders();
 
             // UPDATE
             GLFW.glfwSwapBuffers(window.WINDOW);
