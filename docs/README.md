@@ -12,7 +12,7 @@ ZephyroGame is an ongoing project created by Zephyros1938, who is actively learn
 
 ## Documentation
 
-View documentation at the [Documentation Page](/doc/Docs.md)
+View documentation at the [Documentation Page](Docs.md)
 
 ## Development Setup
 
