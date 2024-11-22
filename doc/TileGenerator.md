@@ -1,4 +1,4 @@
-# TileGenerator Class Documentation ([`TileGenerator.java`](..\src\game\Display\TileGenerator.java))
+# TileGenerator Class Documentation ([`TileGenerator.java`](/src/game/Display/TileGenerator.java))
 
 The `TileGenerator` class in this file provides functionality for generating tiles with texture coordinates. It uses matrices to represent tile positions and transformations, as well as texture mappings for rendering.
 

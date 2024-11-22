@@ -1,4 +1,4 @@
-# Shader Class Documentation ([`Shader.java`](..\src\game\Display\Shader.java))
+# Shader Class Documentation ([`Shader.java`](/src/game/Display/Shader.java))
 
 The `Shader` class in this file provides a framework for managing OpenGL shaders, including their buffers, vertex attributes, and uniforms. This class facilitates the handling of vertex and texture coordinate buffers and simplifies the process of sending data to the GPU.
 

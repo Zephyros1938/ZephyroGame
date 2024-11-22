@@ -10,6 +10,10 @@ As of **November 15, 2024**, commits will be made exclusively to the [Rework-1.0
 
 ZephyroGame is an ongoing project created by Zephyros1938, who is actively learning Java. As the game is still in development, expect frequent updates and changes.
 
+## Documentation
+
+View documentation at the [Documentation Page](/doc/Docs.md)
+
 ## Development Setup
 
 ### Recompiling the Project
@@ -20,6 +24,6 @@ If you prefer to work with an IDE, we suggest using [Visual Studio Code](https:/
 
 ## License & Legal
 
-Please **do not redistribute** the game unless the code is open-source. This project is meant to remain open-source.
+Please **do not redistribute** the game unless the code is open-source. This project is meant to remain open-source so others can learn at trust what they are downloading.
 
 For more details, please refer to the full [LICENSE](LICENSE) file.
