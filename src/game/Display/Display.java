@@ -32,45 +32,8 @@ public class Display {
         Shader defaultShader = new Shader(Shader.SHADER_COORD_LEN + Shader.SHADER_TEX_COORD_LEN);
         defaultShader.init();
 
-        // defaultShader.addVertCoord(new Matrix3x2f(
-        //         -0.5f, -0.5f,
-        //         -0.5f, 0.5f,
-        //     0.51f, 0.5f));
-
-        // defaultShader.addVertCoord(new Matrix3x2f(
-        //         -0.5f, -0.5f,
-        //         0.5f, -0.5f,
-        //         0.5f, 0.5f));
-
-        // defaultShader.addVertCoord(new Matrix3x2f(
-        //         -0.5f, -1f,
-        //         -0.5f, 1f,
-        //         0.5f, 1f));
-
-        // defaultShader.addVertCoord(new Matrix3x2f(
-        //         -0.5f, -1f,
-        //         0.5f, -1f,
-        //         0.5f, 1f));
-
-        // defaultShader.addTexCoord(new Matrix2f(0f,0f,-1f,0f), new
-        // Matrix2f(-1f,-1f,0f,-1f));
-        // defaultShader.addTexCoord(new Matrix2f(0f,0f,1f,0f), new
-        // Matrix2f(1f,-1f,0f,-1f));
-
-        tileGen.GenerateTile(defaultShader, 0, 0, 1, 1);
-        tileGen.GenerateTile(defaultShader, 4, 2, 1, 1);
-
-        // defaultShader.addTexCoords(new float[] {
-        // 0f, 0f,
-        // -1f, 0f,
-        // -1f, -1f,
-        // 0f, -1f,
-
-        // 0f, 0f,
-        // 1f, 0f,
-        // 1f, -1f,
-        // 0f, -1f }); // Texture coords | Use a matrix so the 'get' method works for
-        // adding to buffer.
+        tileGen.generateTile(defaultShader, 0, 0, 1, 1);
+        tileGen.generateTile(defaultShader, 4, 2, 1, 1);
 
         defaultShader.initShaderBuffers();
 
