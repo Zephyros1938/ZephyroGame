@@ -32,17 +32,18 @@ The `TileGenerator` class in this file provides functionality for generating til
 #### Matrix Definitions:
 - **`TOP_LEFT`**: A `Matrix3x2f` representing the top-left corner of the tile, initialized based on the `scale` factor.
 - **`BOTTOM_RIGHT`**: A `Matrix3x2f` representing the bottom-right corner of the tile, initialized based on the `scale` factor.
-- **`TC0A`, `TC0B`, `TC1A`, `TC1B`**: `Matrix2f` matrices storing texture coordinates for different corners of the tile.
-- **`TC`**: A `Matrix4f` matrix storing combined texture coordinates for the tile, defined as:
-  \[
+- **`TC`**: A `Matrix4x3f` matrix storing combined texture coordinates for the tile, defined as:
+  $$
   \text{TC} =
   \begin{bmatrix}
-  0.0 & 0.0 & -1.0 & 0.0 \\
-  -1.0 & -1.0 & 0.0 & -1.0 \\
-  0.0 & 0.0 & 1.0 & 0.0 \\
-  1.0 & -1.0 & 0.0 & -1.0
+  0.0 & 1.0 \\
+  1.0& 1.0 \\
+  0.0 & 0.0 \\
+  1.0 & 1.0 \\
+  1.0 & 0.0 \\
+  0.0 & 0.0
   \end{bmatrix}
-  \]
+  $$
 
 ---
 

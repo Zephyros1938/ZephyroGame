@@ -4,13 +4,15 @@ import java.io.IOException;
 import java.nio.FloatBuffer;
 
 import org.joml.Matrix2f;
-import org.joml.Matrix3x2f;
+import org.joml.Matrix3f;
+import org.joml.Matrix4f;
+import org.joml.Matrix4x3f;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.system.MemoryUtil;
 
 public class Shader {
 
-    public static final int SHADER_COORD_LEN = 2;
+    public static final int SHADER_COORD_LEN = 3;
     public static final int SHADER_TEX_COORD_LEN = 2;
 
     private final int BUFFER_SIZE = (int) Math.pow(2, 16);
@@ -29,7 +31,7 @@ public class Shader {
 
     private int SHADER_ATTRIBUTE_LEN;
 
-    private int SHADER_CURRENT_INDEX = 0;
+    private int SHADER_CURRENT_INDEX = 2;
     private int SHADER_CURRENT_SIZE = 0;
     private int SHADER_CURRENT_TEXTURE_UNIT = 0;
 
@@ -52,9 +54,9 @@ public class Shader {
         GL30.glBufferData(GL30.GL_ARRAY_BUFFER, VBO_BUFFER, GL30.GL_STATIC_DRAW);
         GL30.glVertexAttribPointer(
                 0,
-                2,
+                SHADER_COORD_LEN,
                 GL30.GL_FLOAT,
-                true,
+                false,
                 SHADER_COORD_LEN * Float.BYTES,
                 0);
         GL30.glEnableVertexAttribArray(0);
@@ -65,82 +67,64 @@ public class Shader {
         GL30.glBufferData(GL30.GL_ARRAY_BUFFER, TBO_BUFFER, GL30.GL_STATIC_DRAW);
         GL30.glVertexAttribPointer(
                 1,
-                2,
+                SHADER_TEX_COORD_LEN,
                 GL30.GL_FLOAT,
-                true,
+                false,
                 SHADER_TEX_COORD_LEN * Float.BYTES,
                 0);
         GL30.glEnableVertexAttribArray(1);
         SHADER_CURRENT_SIZE += TBO_BUFFER_SIZE;
     }
 
-    public void addVertCoord(Matrix3x2f m) {
+    public void addVertCoord(Matrix3f m) {
         System.out.println("Adding to Vert Coord At Index " + VBO_BUFFER_INDEX);
         m.get(VBO_BUFFER_INDEX, VBO_BUFFER);
-        VBO_BUFFER_INDEX += 6;
-        VBO_BUFFER_SIZE+=1;
+        VBO_BUFFER_INDEX += 9;
+        VBO_BUFFER_SIZE += 1;
     }
 
-    public void addTexCoord(Matrix2f m0, Matrix2f m1) {
+    public void addTexCoord(Matrix4x3f m0) {
         System.out.println("Adding to TexCoord 1 at index " + TBO_BUFFER_INDEX);
         m0.get(TBO_BUFFER_INDEX, TBO_BUFFER);
-        TBO_BUFFER_INDEX += 4;
-        System.out.println("Adding to TexCoord 2 at index " + TBO_BUFFER_INDEX);
-        m1.get(TBO_BUFFER_INDEX, TBO_BUFFER);
-        TBO_BUFFER_INDEX += 4;
-        TBO_BUFFER_SIZE+=2;
+        TBO_BUFFER_INDEX += 12;
+        TBO_BUFFER_SIZE += 4;
     }
 
-    public void addVertexCoords(FloatBuffer vertices) {
-        GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, VBO);
-        GL30.glBufferData(GL30.GL_ARRAY_BUFFER, vertices, GL30.GL_STATIC_DRAW);
-        GL30.glVertexAttribPointer(SHADER_CURRENT_INDEX,
-                SHADER_COORD_LEN,
-                GL30.GL_FLOAT, true,
-                SHADER_COORD_LEN * Float.BYTES,
-                SHADER_CURRENT_SIZE * Float.BYTES);
-        GL30.glEnableVertexAttribArray(SHADER_CURRENT_INDEX++);
-        SHADER_CURRENT_SIZE += SHADER_COORD_LEN;
-    }
-
-    public void addTexCoords(float[] TEX_COORDS) {
-        GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, TBO);
-        GL30.glBufferData(GL30.GL_ARRAY_BUFFER, TEX_COORDS, GL30.GL_STATIC_DRAW);
-        GL30.glVertexAttribPointer(SHADER_CURRENT_INDEX,
-                SHADER_TEX_COORD_LEN,
-                GL30.GL_FLOAT, true,
-                SHADER_TEX_COORD_LEN * Float.BYTES,
-                SHADER_CURRENT_SIZE * Float.BYTES);
-        GL30.glEnableVertexAttribArray(SHADER_CURRENT_INDEX++);
-        SHADER_CURRENT_SIZE += SHADER_TEX_COORD_LEN;
+    public void addTexCoord4x4(Matrix4f m0) {
+        System.out.println("Adding to TexCoord 1 at index " + TBO_BUFFER_INDEX);
+        m0.get(TBO_BUFFER_INDEX, TBO_BUFFER);
+        TBO_BUFFER_INDEX += 16;
+        TBO_BUFFER_SIZE += 4;
     }
 
     public void addVertexAttribPointer(int SIZE) {
-        GL30.glVertexAttribPointer(SHADER_CURRENT_INDEX,
+        GL30.glVertexAttribPointer(
+                SHADER_CURRENT_INDEX,
                 SIZE,
-                GL30.GL_FLOAT, true,
+                GL30.GL_FLOAT,
+                true,
                 SHADER_ATTRIBUTE_LEN * Float.BYTES,
                 SHADER_CURRENT_SIZE * Float.BYTES);
         GL30.glEnableVertexAttribArray(SHADER_CURRENT_INDEX++);
         SHADER_CURRENT_SIZE += SIZE;
     }
 
-    public void addUniformAttrib1f(float V0, CharSequence NAME) {
+    public void addUniformAttrib(float V0, CharSequence NAME) {
         int uniformLocation = GL30.glGetUniformLocation(SHADER_PROGRAM, NAME);
         GL30.glUniform1f(uniformLocation, V0);
     }
 
-    public void addUniformAttrib2f(float V0, float V1, CharSequence NAME) {
+    public void addUniformAttrib(float V0, float V1, CharSequence NAME) {
         int uniformLocation = GL30.glGetUniformLocation(SHADER_PROGRAM, NAME);
         GL30.glUniform2f(uniformLocation, V0, V1);
     }
 
-    public void addUniformAttrib3f(float V0, float V1, float V2, CharSequence NAME) {
+    public void addUniformAttrib(float V0, float V1, float V2, CharSequence NAME) {
         int uniformLocation = GL30.glGetUniformLocation(SHADER_PROGRAM, NAME);
         GL30.glUniform3f(uniformLocation, V0, V1, V2);
     }
 
-    public void addUniformAttrib4f(float V0, float V1, float V2, float V3, CharSequence NAME) {
+    public void addUniformAttrib(float V0, float V1, float V2, float V3, CharSequence NAME) {
         int uniformLocation = GL30.glGetUniformLocation(SHADER_PROGRAM, NAME);
         GL30.glUniform4f(uniformLocation, V0, V1, V2, V3);
     }

@@ -31,25 +31,22 @@ The `Shader` class in this file provides a framework for managing OpenGL shaders
 - **`void addTexCoord(Matrix2f m0, Matrix2f m1)`**  
   Adds texture coordinates to the TBO buffer from two 2x2 matrices.
 
-- **`void addVertexCoords(FloatBuffer vertices)`**  
-  Uploads a buffer of vertex coordinates to the GPU.
-
-- **`void addTexCoords(float[] TEX_COORDS)`**  
-  Uploads an array of texture coordinates to the GPU.
+- **`void addTexCoord4x4(Matrix4f m0)`**  
+  Adds texture coordinates to the TBO buffer from a 4x4 matrix.
 
 - **`void addVertexAttribPointer(int SIZE)`**  
   Configures the shader attribute pointer for a vertex attribute of the specified size.
 
-- **`void addUniformAttrib1f(float V0, CharSequence NAME)`**  
+- **`void addUniformAttrib(float V0, CharSequence NAME)`**  
   Sends a float uniform variable to the shader.
 
-- **`void addUniformAttrib2f(float V0, float V1, CharSequence NAME)`**  
+- **`void addUniformAttrib(float V0, float V1, CharSequence NAME)`**  
   Sends a 2D vector uniform variable to the shader.
 
-- **`void addUniformAttrib3f(float V0, float V1, float V2, CharSequence NAME)`**  
+- **`void addUniformAttrib(float V0, float V1, float V2, CharSequence NAME)`**  
   Sends a 3D vector uniform variable to the shader.
 
-- **`void addUniformAttrib4f(float V0, float V1, float V2, float V3, CharSequence NAME)`**  
+- **`void addUniformAttrib(float V0, float V1, float V2, float V3, CharSequence NAME)`**  
   Sends a 4D vector uniform variable to the shader.
 
 - **`void bindTexture(Texture tex, int TEX_WIDTH, int TEX_HEIGHT)`**  

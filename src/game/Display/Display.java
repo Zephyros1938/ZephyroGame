@@ -32,8 +32,10 @@ public class Display {
         Shader defaultShader = new Shader(Shader.SHADER_COORD_LEN + Shader.SHADER_TEX_COORD_LEN);
         defaultShader.init();
 
-        tileGen.generateTile(defaultShader, 0, 0, 1, 1);
-        tileGen.generateTile(defaultShader, 4, 2, 1, 1);
+        tileGen.bindShader(defaultShader);
+
+        tileGen.generateTile(0f, 0f, 1f, 1f, 1f);
+        tileGen.generateTile(4f, 2f, -2f, 1f, 1f);
 
         defaultShader.initShaderBuffers();
 
